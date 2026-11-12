@@ -303,12 +303,15 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
                 ("``0b1``", "JESD core enabled.")
             ], reset=default_enable),
         ])
+        # The same register map is used for TX and RX cores (CSR layout kept identical): the RX
+        # only fields and registers (skew_fifo, lane_status, crc_errors, emb_debug) read 0 on a TX
+        # core.
         self.status = CSRStatus(fields=[
             CSRField("ready", size=1, offset=0, values=[
                 ("``0b0``", "JESD core not ready, all links are not synchronized."),
                 ("``0b1``", "JESD core ready, all links are synchronized.")
             ]),
-            CSRField("skew_fifo", size=8, offset=8, description="JESD Skew FIFO level (``RX only``)."),
+            CSRField("skew_fifo", size=8, offset=8, description="JESD Skew FIFO level (``RX only``, reads 0 on a TX core)."),
         ])
         self.stpl_enable = CSRStorage(fields=[
             CSRField("enable", size=1, offset=0, values=[
@@ -323,13 +326,13 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
                 description = "LEMC reload value on SYSREF rising edge."),
         ])
         self.lane_status = CSRStatus(fields=[
-            CSRField("sh_lock",  size=8, offset=0, description="Per-lane sync header lock (``RX only``)."),
-            CSRField("emb_lock", size=8, offset=8, description="Per-lane extended multiblock lock (``RX only``)."),
+            CSRField("sh_lock",  size=8, offset=0, description="Per-lane sync header lock (``RX only``, reads 0 on a TX core)."),
+            CSRField("emb_lock", size=8, offset=8, description="Per-lane extended multiblock lock (``RX only``, reads 0 on a TX core)."),
         ])
-        self.crc_errors = CSRStatus(32, description="Accumulated CRC-12 errors, all lanes (``RX only``).")
+        self.crc_errors = CSRStatus(32, description="Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core).")
         self.emb_debug  = CSRStatus(fields=[
-            CSRField("state",     size=8, offset=0, description="EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``)."),
-            CSRField("eomb_seen", size=8, offset=8, description="Per-lane sticky EoMB-detected flag (``RX only``)."),
+            CSRField("state",     size=8, offset=0, description="EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``, reads 0 on a TX core)."),
+            CSRField("eomb_seen", size=8, offset=8, description="Per-lane sticky EoMB-detected flag (``RX only``, reads 0 on a TX core)."),
         ])
 
         # # #
