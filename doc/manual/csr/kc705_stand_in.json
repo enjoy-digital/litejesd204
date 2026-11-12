@@ -122,7 +122,7 @@
    },
    {
     "access": "ro",
-    "description": "STPL test errors.",
+    "description": "STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).",
     "fields": [],
     "name": "stpl_errors",
     "offset": 12,
@@ -292,7 +292,7 @@
    },
    {
     "access": "ro",
-    "description": "STPL test errors.",
+    "description": "STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).",
     "fields": [],
     "name": "stpl_errors",
     "offset": 12,
@@ -410,7 +410,7 @@
    },
    {
     "access": "ro",
-    "description": "STPL test errors.",
+    "description": "STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).",
     "fields": [],
     "name": "stpl_errors",
     "offset": 12,
@@ -589,7 +589,7 @@
    },
    {
     "access": "ro",
-    "description": "STPL test errors.",
+    "description": "STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).",
     "fields": [],
     "name": "stpl_errors",
     "offset": 12,

@@ -44,7 +44,7 @@ Bank `jesd204b_tx`.
 | `control` | `0x0000` | 9 | rw | See the fields below. Reset `0x0`. |
 | `status` | `0x0004` | 16 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
-| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
+| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 4 | rw | LMFC reload value on SYSREF rising edge. |
 
 Fields of `control`:
@@ -86,7 +86,7 @@ Bank `jesd204b_rx`.
 | `control` | `0x0000` | 9 | rw | See the fields below. Reset `0x0`. |
 | `status` | `0x0004` | 16 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
-| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
+| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 4 | rw | LMFC reload value on SYSREF rising edge. |
 | `skew_levels` | `0x0014` | 32 | ro | Per-lane Skew FIFO levels, 8-bit per lane, lane0 in bits [7:0] (``RX only``). |
 | `skew_overflows` | `0x0018` | 8 | ro | Per-lane sticky Skew FIFO overflow flags, cleared on link resync (``RX only``). |
@@ -122,7 +122,7 @@ Bank `jesd204c_tx`.
 | `control` | `0x0000` | 1 | rw | 1: links out of reset, the core runs. 0: links held in reset. Reset `0x0`. |
 | `status` | `0x0004` | 16 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
-| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
+| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. |
 | `lane_status` | `0x0014` | 16 | ro | See the fields below. |
 | `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core). |
@@ -165,7 +165,7 @@ Bank `jesd204c_rx`.
 | `control` | `0x0000` | 1 | rw | 1: links out of reset, the core runs. 0: links held in reset. Reset `0x0`. |
 | `status` | `0x0004` | 16 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
-| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
+| `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. |
 | `lane_status` | `0x0014` | 16 | ro | See the fields below. |
 | `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core). |
