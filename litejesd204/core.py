@@ -385,13 +385,15 @@ class LiteJESD204BCoreControl(Module, AutoCSR):
             ], reset=default_ilas_check_disable |
                 int(hasattr(core, "ilas_check") and not core.ilas_check.reset.value))
         ])
+        # The same register map is used for TX and RX cores (CSR layout kept identical): the RX
+        # only fields read 0 and ilas_check_disable has no effect on a TX core.
         self.status = CSRStatus(fields=[
             CSRField("ready", size=1, offset=0, values=[
                 ("``0b0``", "JESD core not ready, all links are not synchronized."),
                 ("``0b1``", "JESD core ready, all links are synchronized.")
             ]),
             CSRField("sync_n",    size=1, offset=1, description="JESD ``SYNC~`` status."),
-            CSRField("skew_fifo", size=8, offset=8, description="JESD Skew FIFO level (``RX only``)."),
+            CSRField("skew_fifo", size=8, offset=8, description="JESD Skew FIFO level (``RX only``, reads 0 on a TX core)."),
         ])
         self.stpl_enable = CSRStorage(fields=[
             CSRField("enable", size=1, offset=0, values=[
