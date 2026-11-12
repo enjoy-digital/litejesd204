@@ -4,6 +4,7 @@
 # Copyright (c) 2016-2019 Florent Kermarrec <florent@enjoy-digital.fr>
 # SPDX-License-Identifier: BSD-2-Clause
 
+import copy
 from math import ceil
 
 # Control characters -------------------------------------------------------------------------------
@@ -199,7 +200,8 @@ class JESD204CSettings(JESD204BSettings):
         )
         self.e = e
 
-        # JESD204C revision.
+        # JESD204C revision (on a copy: the physical settings may be shared with 204B settings).
+        self.phy       = copy.copy(self.phy)
         self.phy.jesdv = 0b010
 
         self.octets_per_block      = 8
