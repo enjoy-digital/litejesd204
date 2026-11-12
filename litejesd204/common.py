@@ -18,6 +18,9 @@ control_characters = {
 
 # Configuration data -------------------------------------------------------------------------------
 
+# Fields of the 14 ILAS configuration octets: octet index, bit offset and width in bits (JESD204B
+# link configuration data, octets 0 to 13).
+
 class Field:
     def __init__(self, octet, offset, width):
         self.octet  = octet
@@ -31,14 +34,14 @@ configuration_data_fields = {
     "did":       Field(0,  0, 8), # device id
     #----------- octet 1 --------------
     "bid":       Field(1,  0, 4), # bank id
-    "adjcnt":    Field(1,  4, 8), # N/A (subclass 2 only)
+    "adjcnt":    Field(1,  4, 4), # N/A (subclass 2 only)
     #----------- octet 2 --------------
     "lid":       Field(2,  0, 5), # lane id
-    "phadj":     Field(2,  5, 5), # N/A (subclass 2 only)
-    "adjdir":    Field(2,  6, 6), # N/A (subclass 2 only)
+    "phadj":     Field(2,  5, 1), # N/A (subclass 2 only)
+    "adjdir":    Field(2,  6, 1), # N/A (subclass 2 only)
     #----------- octet 3 --------------
     "l":         Field(3,  0, 5),
-    "scr":       Field(3,  7, 8), # scrambling enable
+    "scr":       Field(3,  7, 1), # scrambling enable
     #----------- octet 4 --------------
     "f":         Field(4,  0, 8),
     #----------- octet 5 --------------
@@ -47,16 +50,16 @@ configuration_data_fields = {
     "m":         Field(6,  0, 8),
     #----------- octet 7 --------------
     "n":         Field(7,  0, 5),
-    "cs":        Field(7,  6, 8),
+    "cs":        Field(7,  6, 2),
     #----------- octet 8 --------------
     "np":        Field(8,  0, 5),
-    "subclassv": Field(8,  5, 8), # device subclass version
+    "subclassv": Field(8,  5, 3), # device subclass version
     #----------- octet 9 --------------
     "s":         Field(9,  0, 5),
-    "jesdv":     Field(9,  5, 8), # jesd204 version
+    "jesdv":     Field(9,  5, 3), # jesd204 version
     #----------- octet 10 -------------
     "cf":        Field(10, 0, 5),
-    "hd":        Field(10, 5, 8),
+    "hd":        Field(10, 7, 1), # high density format
     #----------- octet 11 -------------
     "res1":      Field(11, 0, 8),
     #----------- octet 12 -------------

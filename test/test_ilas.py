@@ -76,6 +76,44 @@ class TestILAS(unittest.TestCase):
         # Verify that octets are identical.
         self.assertEqual(ref_octets, config_octets)
 
+    def test_config_data_fields(self):
+        # Each field at its maximum value lands at its own bits (JESD204B configuration octets).
+        expected = {
+            "did":       (0,  0xff),
+            "bid":       (1,  0x0f),
+            "adjcnt":    (1,  0xf0),
+            "lid":       (2,  0x1f),
+            "phadj":     (2,  0x20),
+            "adjdir":    (2,  0x40),
+            "l":         (3,  0x1f),
+            "scr":       (3,  0x80),
+            "f":         (4,  0xff),
+            "k":         (5,  0x1f),
+            "m":         (6,  0xff),
+            "n":         (7,  0x1f),
+            "cs":        (7,  0xc0),
+            "np":        (8,  0x1f),
+            "subclassv": (8,  0xe0),
+            "s":         (9,  0x1f),
+            "jesdv":     (9,  0xe0),
+            "cf":        (10, 0x1f),
+            "hd":        (10, 0x80),
+        }
+        for name, (octet, mask) in expected.items():
+            with self.subTest(field=name):
+                config_data = JESD204BConfigurationData()
+                setattr(config_data, name, 0xff)
+                octets = config_data.get_octets()
+                self.assertEqual(octets, [mask if i == octet else 0 for i in range(len(octets))])
+                # Parsing back only sets this field.
+                parsed = JESD204BConfigurationData(octets=octets)
+                for other in expected:
+                    value = getattr(parsed, other)
+                    if other == name:
+                        self.assertEqual(value, mask >> configuration_data_fields[name].offset)
+                    else:
+                        self.assertEqual(value, 0, other)
+
     def test_ilas_generator(self):
         ps = JESD204BPhysicalSettings(l=4, m=4, n=14, np=16)
         ts = JESD204BTransportSettings(f=2, s=1, k=32, cs=2)
