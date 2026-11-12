@@ -365,7 +365,8 @@ class LiteJESD204BCoreRX(Module):
 # Core Control -------------------------------------------------------------------------------------
 
 class LiteJESD204BCoreControl(Module, AutoCSR):
-    def __init__(self, core, sys_clk_freq, default_enable=0, default_ilas_check_disable=0, default_stpl_enable=0,
+    # sys_clk_freq: unused, kept (optional) for API compatibility.
+    def __init__(self, core, sys_clk_freq=None, default_enable=0, default_ilas_check_disable=0, default_stpl_enable=0,
         with_lane_status = False):
         self.control = CSRStorage(fields=[
             CSRField("enable", size=1, values=[

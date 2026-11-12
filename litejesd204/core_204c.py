@@ -294,7 +294,8 @@ class LiteJESD204CCoreRX(Module):
 # Core Control -------------------------------------------------------------------------------------
 
 class LiteJESD204CCoreControl(Module, AutoCSR):
-    def __init__(self, core, sys_clk_freq, default_enable=0, default_stpl_enable=0):
+    # sys_clk_freq: unused, kept (optional) for API compatibility.
+    def __init__(self, core, sys_clk_freq=None, default_enable=0, default_stpl_enable=0):
         self.control = CSRStorage(fields=[
             CSRField("enable", size=1, values=[
                 ("``0b0``", "JESD core disabled."),
