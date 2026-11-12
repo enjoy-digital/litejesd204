@@ -9,7 +9,7 @@ import unittest
 from migen import *
 
 from litejesd204.common import *
-from litejesd204.transport import LiteJESD204BSTPLChecker, seed_to_data
+from litejesd204.transport import LiteJESD204BSTPLGenerator, LiteJESD204BSTPLChecker, seed_to_data
 
 from litex.soc.interconnect import stream
 
@@ -76,6 +76,27 @@ class TestSTPL(unittest.TestCase):
 
         run_simulation(dut, generator(dut))
         self.assertEqual(errors, [0, 4, 4, 0])
+
+    def test_stpl_n_lt_16(self):
+        # Generator -> checker with N < 16 (N-bit samples of the 16-bit pattern): no error.
+        for n, random in [(14, True), (12, True), (16, True), (14, False)]:
+            with self.subTest(n=n, random=random):
+                ps  = JESD204BPhysicalSettings(l=1, m=1, n=n, np=16)
+                ts  = JESD204BTransportSettings(f=2, s=1, k=32, cs=0)
+                settings = JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
+                dut = Module()
+                dut.submodules.gen = gen = LiteJESD204BSTPLGenerator(settings, 2*n, random=random)
+                dut.submodules.chk = chk = LiteJESD204BSTPLChecker(settings, 2*n, random=random)
+                dut.comb += chk.sink.eq(gen.source)
+                errors = []
+
+                def generator():
+                    for _ in range(8):
+                        yield
+                    errors.append((yield chk.errors))
+
+                run_simulation(dut, generator())
+                self.assertEqual(errors, [0])
 
     def check_core_rx_not_ready(self, core_cls, settings_cls, phy_cls):
         # RX core not ready (nothing received): no STPL error counted, STPL enabled or not.
