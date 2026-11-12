@@ -54,9 +54,10 @@ Cores (`litejesd204.core` for JESD204B, `litejesd204.core_204c` for JESD204C):
  - TX/RX cores with LMFC/LEMC counter (SYSREF/JREF), clock domain crossings to the PHYs.
  - Control/Status CSRs for LiteX SoCs.
 
-PHY (in LiteICLink):
- - 7-Series GTP/GTX and UltraScale(+) GTH/GTY 8b10b wrappers for JESD204B.
- - UltraScale+ GTH 64b66b wrapper (`gth4_ultrascale_64b66b`) for JESD204C.
+PHY:
+ - JESD204B: 7-Series GTP/GTX and UltraScale(+) GTH/GTY 8b10b wrappers of LiteICLink.
+ - JESD204C: the cores expect a 64b66b PHY (64-bit data + 2-bit sync header per block, RX gearbox
+   slip); no LiteICLink 64b66b wrapper is merged yet (UltraScale+ GTH one in development).
 
 [> FPGA Proven
 ---------------
