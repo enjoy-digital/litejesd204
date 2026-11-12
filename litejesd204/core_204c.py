@@ -329,7 +329,7 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
         self.stpl_errors = CSRStatus(32, description="STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).")
         self.lmfc        = CSRStorage(fields=[
             CSRField("load_on_sysref", size=len(core.lmfc.load),
-                reset       = core.lmfc.load.reset,
+                reset       = core.lmfc.load.reset.value,
                 description = "LEMC reload value on SYSREF rising edge."),
         ])
         self.lane_status = CSRStatus(fields=[
