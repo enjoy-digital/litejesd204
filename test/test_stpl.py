@@ -98,7 +98,7 @@ class TestSTPL(unittest.TestCase):
                 run_simulation(dut, generator())
                 self.assertEqual(errors, [0])
 
-    def check_core_rx_not_ready(self, core_cls, settings_cls, phy_cls):
+    def check_core_rx_not_ready(self, core_cls, settings_cls, phy_cls, cdw):
         # RX core not ready (nothing received): no STPL error counted, STPL enabled or not.
         ps   = JESD204BPhysicalSettings(l=2, m=4, n=16, np=16)
         ts   = JESD204BTransportSettings(f=4, s=1, k=32, cs=0)
@@ -108,7 +108,7 @@ class TestSTPL(unittest.TestCase):
         for n in range(2):
             setattr(dut.submodules, f"phy{n}", phys[n])
             dut.clock_domains += ClockDomain(f"jesd_phy{n}_rx")
-        dut.submodules.rx = rx = core_cls(phys, settings_cls(ps, ts, did=0x5a, bid=0x5), 32)
+        dut.submodules.rx = rx = core_cls(phys, settings_cls(ps, ts, did=0x5a, bid=0x5), cdw)
         if hasattr(rx, "register_jsync"):
             rx.register_jsync(Signal())
         rx.register_jref(Signal())
@@ -131,8 +131,8 @@ class TestSTPL(unittest.TestCase):
     def test_core_rx_not_ready(self):
         from litejesd204.core      import LiteJESD204BCoreRX
         from litejesd204.core_204c import LiteJESD204CCoreRX
-        self.check_core_rx_not_ready(LiteJESD204BCoreRX, JESD204BSettings, FakePHY204B)
-        self.check_core_rx_not_ready(LiteJESD204CCoreRX, JESD204CSettings, test_core_204c.FakePHY)
+        self.check_core_rx_not_ready(LiteJESD204BCoreRX, JESD204BSettings, FakePHY204B, cdw=16)
+        self.check_core_rx_not_ready(LiteJESD204CCoreRX, JESD204CSettings, test_core_204c.FakePHY, cdw=32)
 
 if __name__ == "__main__":
     unittest.main()
