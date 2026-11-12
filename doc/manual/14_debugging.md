@@ -280,7 +280,6 @@ the open pull request that changes the code, "issue" the open issue where a fix 
 | STPL values | The core's own pattern, not the standard test patterns | Check against a LiteJESD204 TX only |
 | Lane status width | 204B: levels and alignment of lanes 0-3, overflows of lanes 0-7; 204C: `emb_debug` of lanes 0-3 | Probe the other lanes with LiteScope |
 | Skew levels, 8 bits | Levels of 256 or more wrap, also the 204C skew FIFO with E = 2 | Keep F*K/4 under 64 link clocks, E = 1; issue #31 |
-| SVD export | Fails on the reset of the `lmfc` field | Use `csr.csv` or `csr.json`; fix pending (PR #30) |
 | Single-lane designs | `KeyError` on `jesd_phy0_rx`: Migen prefixes the PHY domains only when two PHYs collide | Rename the PHY domains, see [naming](#integ-domains); fix pending (PR #23) |
 
 The LMFC counter counts from the load value to the top of its width, not to F*K/4 (or 32*E). When

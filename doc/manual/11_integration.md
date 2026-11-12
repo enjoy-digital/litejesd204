@@ -457,7 +457,7 @@ The repository has no generator script. To use a core outside a LiteX SoC, elabo
 `run=False`. The Verilog of the `gateware` directory then serves as a module of the larger design.
 
 `csr.csv` gives the register addresses on the CSR bus; the `Builder` can also export them as JSON
-or a C header. Its SVD export fails on the `lmfc` register, whose reset value is not a constant.
+or a C header, or as SVD.
 
 ## Migration from LiteJESD204B {#integ-migration}
 
