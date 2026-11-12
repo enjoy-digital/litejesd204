@@ -28,7 +28,8 @@ of components used in today's SoC such as Ethernet, SATA, PCIe, SDRAM Controller
 Using Migen to describe the HDL allows the core to be highly and easily configurable.
 
 LiteJESD204 is used as a LiteX library: designs instantiate its cores in a LiteX SoC or in a
-Migen module (there is no standalone Verilog generator).
+Migen module (there is no standalone Verilog generator). The Verilog of a LiteX design using the
+cores can be integrated in another design flow.
 
 LiteJESD204 was previously named LiteJESD204B, see the migration section below.
 
@@ -49,6 +50,7 @@ Link layer JESD204C (`litejesd204.link_204c`):
 Transport layer (`litejesd204.transport`, shared):
  - Converters <--> lanes mapping.
  - Simple Transport Layer Pattern (STPL) generator/checker.
+ - No control bits: CS is advertised in the ILAS but no control bits are inserted (use cs=0).
 
 Cores (`litejesd204.core` for JESD204B, `litejesd204.core_204c` for JESD204C):
  - TX/RX cores with LMFC/LEMC counter (SYSREF/JREF), clock domain crossings to the PHYs.
