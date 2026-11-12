@@ -19,6 +19,7 @@ from litex.soc.interconnect import stream
 
 from litejesd204.transport import LiteJESD204BTransportTX, LiteJESD204BTransportRX
 from litejesd204.transport import LiteJESD204BSTPLGenerator, LiteJESD204BSTPLChecker
+from litejesd204.transport import lane_data_width_error
 from litejesd204.link import LiteJESD204BLinkTX, LiteJESD204BLinkRX
 
 # Clock Domain Crossing ----------------------------------------------------------------------------
@@ -144,6 +145,8 @@ class LiteJESD204BCoreTX(Module):
         transport = LiteJESD204BTransportTX(jesd_settings, converter_data_width)
         transport = ClockDomainsRenamer("jesd")(transport)
         self.submodules.transport = transport
+        for lane in transport.source.flatten():
+            assert len(lane) == 32, lane_data_width_error(jesd_settings, converter_data_width, len(lane), 32)
 
         # STPL
         stpl = LiteJESD204BSTPLGenerator(jesd_settings, converter_data_width, random=stpl_random)
@@ -239,6 +242,8 @@ class LiteJESD204BCoreRX(Module):
         transport = LiteJESD204BTransportRX(jesd_settings, converter_data_width)
         transport = ClockDomainsRenamer("jesd")(transport)
         self.submodules.transport = transport
+        for lane in transport.sink.flatten():
+            assert len(lane) == 32, lane_data_width_error(jesd_settings, converter_data_width, len(lane), 32)
 
         # STPL
         stpl = LiteJESD204BSTPLChecker(jesd_settings, converter_data_width, stpl_random)

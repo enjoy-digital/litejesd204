@@ -12,6 +12,20 @@ from migen import *
 def seed_to_data(seed, random=True):
     return ((seed + 1)*0x31415979 + 1) & 0xffff if random else seed
 
+def check_converter_data_width(jesd_settings, converter_data_width):
+    n = jesd_settings.phy.n
+    assert (converter_data_width >= n) and (converter_data_width % n == 0), \
+        f"converter_data_width ({converter_data_width}) must be a non-zero multiple of N ({n})."
+
+def lane_data_width_error(jesd_settings, converter_data_width, lane_data_width, required):
+    # converter_data_width giving the required lane width: samples_per_clock*N with
+    # samples_per_clock = required*L/(N'*M).
+    ps                = jesd_settings.phy
+    samples_per_clock = (required*ps.l)/(ps.np*ps.m)
+    return (f"converter_data_width ({converter_data_width}) gives {lane_data_width}-bit lanes, "
+            f"the core needs {required}-bit lanes (converter_data_width = {samples_per_clock*ps.n:g} "
+            f"with L={ps.l}, M={ps.m}, N={ps.n}, N'={ps.np}).")
+
 # Transport TX -------------------------------------------------------------------------------------
 
 class LiteJESD204BTransportTX(Module):
@@ -22,6 +36,8 @@ class LiteJESD204BTransportTX(Module):
     cf section 5.1.3
     """
     def __init__(self, jesd_settings, converter_data_width):
+        check_converter_data_width(jesd_settings, converter_data_width)
+
         # Compute parameters
         samples_per_clock = converter_data_width//jesd_settings.phy.n
         samples_per_frame = jesd_settings.transport.s
@@ -94,6 +110,8 @@ class LiteJESD204BTransportRX(Module):
     cf section 5.1.3
     """
     def __init__(self, jesd_settings, converter_data_width):
+        check_converter_data_width(jesd_settings, converter_data_width)
+
         # Compute parameters
         samples_per_clock = converter_data_width//jesd_settings.phy.n
         samples_per_frame = jesd_settings.transport.s

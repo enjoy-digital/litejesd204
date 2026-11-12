@@ -21,6 +21,7 @@ from litejesd204.transport import LiteJESD204BSTPLGenerator, LiteJESD204BSTPLChe
 from litejesd204.core      import LMFC
 from litejesd204.link_204c import LiteJESD204CLinkTX, LiteJESD204CLinkRX
 from litejesd204.link_204c import BlockSync, link_204c_layout
+from litejesd204.transport import lane_data_width_error
 
 # JESD204C PHY contract: phy.sink/source = Endpoint([("data", 64), ("header", 2)]), one 66-bit block
 # per beat at linerate/66, plus phy.rx_slip (RX gearbox slip, PHY RX clock domain). There is no
@@ -88,7 +89,7 @@ class LiteJESD204CCoreTX(Module):
         transport = ClockDomainsRenamer("jesd")(transport)
         self.submodules.transport = transport
         for lane in transport.source.flatten():
-            assert len(lane) == 64
+            assert len(lane) == 64, lane_data_width_error(jesd_settings, converter_data_width, len(lane), 64)
 
         # STPL
         stpl = LiteJESD204BSTPLGenerator(jesd_settings, converter_data_width, random=stpl_random)
@@ -169,7 +170,7 @@ class LiteJESD204CCoreRX(Module):
         transport = ClockDomainsRenamer("jesd")(transport)
         self.submodules.transport = transport
         for lane in transport.sink.flatten():
-            assert len(lane) == 64
+            assert len(lane) == 64, lane_data_width_error(jesd_settings, converter_data_width, len(lane), 64)
 
         # STPL
         stpl = LiteJESD204BSTPLChecker(jesd_settings, converter_data_width, stpl_random)
