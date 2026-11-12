@@ -80,7 +80,7 @@
       "values": []
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``).",
+      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
@@ -250,7 +250,7 @@
       "values": []
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``).",
+      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
@@ -368,7 +368,7 @@
       ]
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``).",
+      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
@@ -440,7 +440,7 @@
     "description": "",
     "fields": [
      {
-      "description": "Per-lane sync header lock (``RX only``).",
+      "description": "Per-lane sync header lock (``RX only``, reads 0 on a TX core).",
       "name": "sh_lock",
       "offset": 0,
       "reset": 0,
@@ -448,7 +448,7 @@
       "values": []
      },
      {
-      "description": "Per-lane extended multiblock lock (``RX only``).",
+      "description": "Per-lane extended multiblock lock (``RX only``, reads 0 on a TX core).",
       "name": "emb_lock",
       "offset": 8,
       "reset": 0,
@@ -463,7 +463,7 @@
    },
    {
     "access": "ro",
-    "description": "Accumulated CRC-12 errors, all lanes (``RX only``).",
+    "description": "Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core).",
     "fields": [],
     "name": "crc_errors",
     "offset": 24,
@@ -475,7 +475,7 @@
     "description": "",
     "fields": [
      {
-      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``).",
+      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``, reads 0 on a TX core).",
       "name": "state",
       "offset": 0,
       "reset": 0,
@@ -483,7 +483,7 @@
       "values": []
      },
      {
-      "description": "Per-lane sticky EoMB-detected flag (``RX only``).",
+      "description": "Per-lane sticky EoMB-detected flag (``RX only``, reads 0 on a TX core).",
       "name": "eomb_seen",
       "offset": 8,
       "reset": 0,
@@ -547,7 +547,7 @@
       ]
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``).",
+      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
@@ -619,7 +619,7 @@
     "description": "",
     "fields": [
      {
-      "description": "Per-lane sync header lock (``RX only``).",
+      "description": "Per-lane sync header lock (``RX only``, reads 0 on a TX core).",
       "name": "sh_lock",
       "offset": 0,
       "reset": 0,
@@ -627,7 +627,7 @@
       "values": []
      },
      {
-      "description": "Per-lane extended multiblock lock (``RX only``).",
+      "description": "Per-lane extended multiblock lock (``RX only``, reads 0 on a TX core).",
       "name": "emb_lock",
       "offset": 8,
       "reset": 0,
@@ -642,7 +642,7 @@
    },
    {
     "access": "ro",
-    "description": "Accumulated CRC-12 errors, all lanes (``RX only``).",
+    "description": "Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core).",
     "fields": [],
     "name": "crc_errors",
     "offset": 24,
@@ -654,7 +654,7 @@
     "description": "",
     "fields": [
      {
-      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``).",
+      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``, reads 0 on a TX core).",
       "name": "state",
       "offset": 0,
       "reset": 0,
@@ -662,7 +662,7 @@
       "values": []
      },
      {
-      "description": "Per-lane sticky EoMB-detected flag (``RX only``).",
+      "description": "Per-lane sticky EoMB-detected flag (``RX only``, reads 0 on a TX core).",
       "name": "eomb_seen",
       "offset": 8,
       "reset": 0,

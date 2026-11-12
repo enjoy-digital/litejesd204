@@ -60,7 +60,7 @@ Fields of `status`:
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
 | `sync_n` | 1 | JESD ``SYNC~`` status. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``). |
+| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
 
 ## JESD204B RX control {#reg-jesd204b-rx}
 
@@ -105,7 +105,7 @@ Fields of `status`:
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
 | `sync_n` | 1 | JESD ``SYNC~`` status. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``). |
+| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
 
 ## JESD204C TX control {#reg-jesd204c-tx}
 
@@ -125,7 +125,7 @@ Bank `jesd204c_tx`.
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. |
 | `lane_status` | `0x0014` | 16 | ro | See the fields below. |
-| `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``). |
+| `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core). |
 | `emb_debug` | `0x001c` | 16 | ro | See the fields below. |
 
 Fields of `status`:
@@ -133,21 +133,21 @@ Fields of `status`:
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``). |
+| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
 
 Fields of `lane_status`:
 
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
-| `sh_lock` | 7:0 | Per-lane sync header lock (``RX only``). |
-| `emb_lock` | 15:8 | Per-lane extended multiblock lock (``RX only``). |
+| `sh_lock` | 7:0 | Per-lane sync header lock (``RX only``, reads 0 on a TX core). |
+| `emb_lock` | 15:8 | Per-lane extended multiblock lock (``RX only``, reads 0 on a TX core). |
 
 Fields of `emb_debug`:
 
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
-| `state` | 7:0 | EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``). |
-| `eomb_seen` | 15:8 | Per-lane sticky EoMB-detected flag (``RX only``). |
+| `state` | 7:0 | EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``, reads 0 on a TX core). |
+| `eomb_seen` | 15:8 | Per-lane sticky EoMB-detected flag (``RX only``, reads 0 on a TX core). |
 
 ## JESD204C RX control {#reg-jesd204c-rx}
 
@@ -168,7 +168,7 @@ Bank `jesd204c_rx`.
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors. |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. |
 | `lane_status` | `0x0014` | 16 | ro | See the fields below. |
-| `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``). |
+| `crc_errors` | `0x0018` | 32 | ro | Accumulated CRC-12 errors, all lanes (``RX only``, reads 0 on a TX core). |
 | `emb_debug` | `0x001c` | 16 | ro | See the fields below. |
 
 Fields of `status`:
@@ -176,18 +176,18 @@ Fields of `status`:
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``). |
+| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
 
 Fields of `lane_status`:
 
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
-| `sh_lock` | 7:0 | Per-lane sync header lock (``RX only``). |
-| `emb_lock` | 15:8 | Per-lane extended multiblock lock (``RX only``). |
+| `sh_lock` | 7:0 | Per-lane sync header lock (``RX only``, reads 0 on a TX core). |
+| `emb_lock` | 15:8 | Per-lane extended multiblock lock (``RX only``, reads 0 on a TX core). |
 
 Fields of `emb_debug`:
 
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
-| `state` | 7:0 | EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``). |
-| `eomb_seen` | 15:8 | Per-lane sticky EoMB-detected flag (``RX only``). |
+| `state` | 7:0 | EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``, reads 0 on a TX core). |
+| `eomb_seen` | 15:8 | Per-lane sticky EoMB-detected flag (``RX only``, reads 0 on a TX core). |
