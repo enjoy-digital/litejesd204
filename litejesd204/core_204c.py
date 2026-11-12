@@ -18,7 +18,7 @@ from litex.soc.interconnect import stream
 
 from litejesd204.transport import LiteJESD204BTransportTX, LiteJESD204BTransportRX
 from litejesd204.transport import LiteJESD204BSTPLGenerator, LiteJESD204BSTPLChecker
-from litejesd204.core      import LMFC
+from litejesd204.core      import LMFC, phy_clock_domain
 from litejesd204.link_204c import LiteJESD204CLinkTX, LiteJESD204CLinkRX
 from litejesd204.link_204c import BlockSync, link_204c_layout
 
@@ -110,8 +110,7 @@ class LiteJESD204CCoreTX(Module):
         # Links
         self.links = links = []
         for n, (phy, lane) in enumerate(zip(phys, transport.source.flatten())):
-            phy_name = "jesd_phy{}".format(n if not hasattr(phy, "n") else phy.n)
-            phy_cd   = phy_name + "_tx"
+            phy_cd = phy_clock_domain(self, phy, n, "tx")
 
             cdc = LiteJESD204CTXCDC(phy, phy_cd)
             setattr(self.submodules, "cdc"+str(n), cdc)
@@ -196,8 +195,7 @@ class LiteJESD204CCoreRX(Module):
         self.lane_starts    = lane_starts    = []
         all_started = Signal()
         for n, (phy, lane) in enumerate(zip(phys, transport.sink.flatten())):
-            phy_name = "jesd_phy{}".format(n if not hasattr(phy, "n") else phy.n)
-            phy_cd = phy_name + "_rx"
+            phy_cd = phy_clock_domain(self, phy, n, "rx")
 
             # Sync header alignment, in the PHY RX clock domain (drives the gearbox slip).
             block_sync = BlockSync()
