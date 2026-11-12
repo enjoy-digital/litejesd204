@@ -81,6 +81,8 @@ enjoy-digital.fr.
 2. Install LiteX and the cores by following the LiteX's wiki [installation guide](https://github.com/enjoy-digital/litex/wiki/Installation).
 3. Instantiate `LiteJESD204BCoreTX/RX` (JESD204B) or `LiteJESD204CCoreTX/RX` (JESD204C) with the PHYs
    from LiteICLink in your LiteX SoC, and add the matching `Core Control` module for the CSRs.
+   `examples/kc705_gtx.py` is a complete JESD204B design (KC705, GTX on SFP, TX looped back to RX)
+   that generates its Verilog without vendor tools (`./kc705_gtx.py`, `--build` with Vivado).
 
 [> Migration from LiteJESD204B
 ------------------------------
