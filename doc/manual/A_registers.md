@@ -32,9 +32,10 @@ holds it. On a TX core, `sync_n` is the SYNC~ level received from the converter,
 the polarity of `register_jsync`: 0 is a synchronization request. `skew_fifo` and
 `stpl_errors` are not driven on TX and read 0; `ilas_check_disable` has no effect.
 
-Every status crosses from the link clock to the system clock through `MultiReg`
-synchronizers, so a multi-bit value read while it changes can be inconsistent. The
-reset value of `lmfc` is the LMFC load of the core, 5 on TX
+The flags and levels cross from the link clock to the system clock through `MultiReg`
+synchronizers, bit by bit, so a level read while it changes can be inconsistent; the
+32-bit `stpl_errors` crosses with a `BusSynchronizer` handshake and always reads a
+value the counter had. The reset value of `lmfc` is the LMFC load of the core, 5 on TX
 ([TX and RX cores](#cores)).
 
 Bank `jesd204b_tx`.
@@ -76,8 +77,8 @@ per multiframe.
 `with_lane_status=True`. They report lanes 0 to 3, except `skew_overflows`,
 which reports lanes 0 to 7. The sticky flags clear when the lane leaves its data
 phase. `stpl_errors` counts the link clock cycles in which at least one sample
-differs from the pattern; software cannot clear it and it also counts while the STPL
-is off, so compare two reads taken with `stpl_enable` set.
+differs from the pattern, only while `stpl_enable` is set and the core is ready; it
+clears when `stpl_enable` goes from 0 to 1.
 
 Bank `jesd204b_rx`.
 
@@ -154,7 +155,8 @@ Fields of `emb_debug`:
 Defined by `LiteJESD204CCoreControl` (`litejesd204/core_204c.py`).
 
 `lane_status` and `crc_errors` cover lanes 0 to 7, `emb_debug` lanes 0 to 3.
-`crc_errors` adds the CRC-12 errors of every lane; software cannot clear it. The
+`crc_errors` adds the CRC-12 errors of every lane; software cannot clear it. Both
+32-bit counters cross to the system clock with a `BusSynchronizer` handshake. The
 reset value of `lmfc` is the RX LEMC load, `lemc_cycles - 5`: 27 here, with E=1.
 `stpl_errors` behaves as on a JESD204B RX core.
 

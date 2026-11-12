@@ -17,7 +17,7 @@ exercises it. Every test runs in the Migen simulator; none needs Verilator or a 
 | Block | One module: scrambler, aligner, ILAS, CRC-12 | The Python models | B and C |
 | Transport | Mapping of converters to lanes, STPL | Transport model | Shared |
 | Link | Link TX datapath, link TX to RX | Models, data round trip | B and C |
-| Core | Core TX to core RX through stand-in PHYs | Data round trip, latency | C only |
+| Core | Core TX to core RX through stand-in PHYs | Data round trip, latency | B and C |
 | Elaboration | SoC with the four control modules | Register export | B and C |
 | Hardware | A board, a transceiver and a converter | The converter | B and C |
 
@@ -40,24 +40,25 @@ python3 -m pytest -v test/test_core_204c.py
 python3 -m pytest -v -k "ilas or align"
 ```
 
-The suite has 34 tests and runs in about two minutes; [Getting started](#getting-started) shows a
-full run. The time goes to the simulations that run thousands of link clocks.
+The suite has 49 tests and runs in a bit over two minutes; [Getting started](#getting-started)
+shows a full run. The time goes to the simulations that run thousands of link clocks.
 
 The `--durations` option of pytest lists the slowest tests; the run below, on the revision this
-manual describes, shows that the two JESD204C core loopbacks take more than half of the total.
+manual describes, shows that the two JESD204C core loopbacks take more than half of the total;
+the JESD204B core loopbacks, with smaller multiframes, take a few seconds.
 
 ```console
-$ python3 -m pytest -q --durations=8
+$ python3 -m pytest -v --durations=8
 [...]
-53.80s call     test/test_core_204c.py::TestCore204C::test_core_loopback_e2
-30.49s call     test/test_core_204c.py::TestCore204C::test_core_loopback
-18.43s call     test/test_link_204c.py::TestLink204C::test_link_roundtrip_e2
-9.29s call     test/test_link_204c.py::TestLink204C::test_link_roundtrip
-9.27s call     test/test_link_204c.py::TestLink204C::test_link_crc_error_detection
-7.17s call     test/test_link.py::TestLink::test_link_loopback
-2.58s call     test/test_link.py::TestLink::test_link_tx
-0.43s call     test/test_link_204c.py::TestCRC12::test_crc12_vs_model
-34 passed in 133.32s (0:02:13)
+51.97s call     test/test_core_204c.py::TestCore204C::test_core_loopback_e2
+27.99s call     test/test_core_204c.py::TestCore204C::test_core_loopback
+17.35s call     test/test_link_204c.py::TestLink204C::test_link_roundtrip_e2
+8.66s call     test/test_link_204c.py::TestLink204C::test_link_roundtrip
+8.58s call     test/test_link_204c.py::TestLink204C::test_link_crc_error_detection
+6.91s call     test/test_link.py::TestLink::test_link_loopback
+3.96s call     test/test_core.py::TestCore::test_core_loopback_f4
+2.50s call     test/test_link.py::TestLink::test_link_tx
+======== 49 passed, 1 warning, 37 subtests passed in 136.59s (0:02:16) =========
 ```
 
 With the pytest-xdist plugin installed, `-n auto` spreads the tests over the CPU cores.
@@ -68,19 +69,25 @@ The table below groups the test files by layer. Each file checks the gateware ag
 model or against a known data sequence.
 
 | File | Area | What it checks |
-|------------------------------|----------------|------------------------------------------------|
+|------------------------------------------------|----------------|--------------------------------|
 | `test_model.py` | Models | Transport mapping, test patterns, scrambling, alignment characters, 8b/10b encode and decode, model round trip |
 | `test_scrambling.py` | 204B link | `Scrambler` and `Descrambler` against the model, loopback |
 | `test_align.py` | 204B link | `Aligner` on words with /R/ at each octet position |
-| `test_ilas.py` | 204B link | Configuration octets round trip, `ILASGenerator` output, `ILASChecker` with injected errors |
+| `test_ilas.py` | 204B link | Configuration octets round trip, position and width of each field, `ILASGenerator` output, `ILASChecker` with injected errors |
 | `test_link.py` | 204B link | TX datapath against the model (scrambling, /A/ and /F/), TX to RX datapath loopback |
 | `test_transport.py` | Transport | TX and RX mapping against the model, loopback, STPL generator and checker |
+| `test_stpl.py` | Transport, cores | STPL checker enable and clear, N < 16 with `stpl_random`, no count while the RX core is not ready |
+| `test_converter_data_width.py` | Cores | Invalid converter port widths rejected with a message |
+| `test_settings_204c.py` | Settings | `JESD204CSettings` leaves the physical settings it receives unchanged |
 | `test_link_204c.py` | 204C link | Scrambler, CRC-12 and sync word against bit-serial models, `BlockSync` lock and slip, link round trips with E=1 and E=2, CRC error injection |
+| `test_core.py` | 204B core | Core TX to core RX through stand-in PHYs, SYNC~ looped, F=2 and F=4: `ready`, STPL, constant latency |
 | `test_core_204c.py` | 204C core | Core TX to core RX through stand-in PHYs, E=1 and E=2: `ready`, STPL, constant latency |
+| `test_control.py` | Control | Control modules with and without `sys_clk_freq` |
+| `test_control_cdc.py` | Control | 32-bit error counters crossed to `sys` as whole words |
+| `test_ilas_check.py` | Control | `ilas_check=False` of the RX core kept with a control module |
+| `test_examples.py` | Examples | The KC705 example elaborated to Verilog, control registers in `csr.csv` |
 
-The JESD204B tests stop at the link datapath: no test runs the JESD204B TX and RX cores
-together, with the LMFC, SYNC~, CGS and ILAS state machines. [What is not
-simulated](#sim-not) lists the other gaps.
+[What is not simulated](#sim-not) lists the gaps.
 
 ## Python models {#sim-models}
 
@@ -102,8 +109,9 @@ reorders bits fails the comparison.
 
 ## Core loopback and stand-in PHYs {#sim-loopback}
 
-`test_core_204c.py` is the only core-level test. It builds a TX core and an RX core of the same
-settings, two lanes and four converters, and connects each lane through a stand-in PHY.
+`test_core_204c.py` and `test_core.py` are the core-level tests. `test_core_204c.py` builds a
+JESD204C TX core and an RX core of the same settings, two lanes and four converters, and connects
+each lane through a stand-in PHY.
 
 The stand-in PHY has the stream ports of the PHY contract and copies its TX blocks to its RX side,
 block aligned, so the sync header lock of the RX core locks without slipping.
@@ -120,6 +128,12 @@ the STPL selected, then checks four things:
 - A ramp written on the TX converter ports comes out of the RX converter ports with a constant
   latency.
 - That latency is shorter than one extended multiblock.
+
+`test_core.py` does the same for JESD204B, with two lanes and two converters, N = N' = 16,
+K = 16 and F = 2 or 4, so a multiframe lasts 8 or 16 link clocks. Its stand-in PHY copies the
+32-bit words and their K-character flags. The SYNC~ output of the RX core drives the TX core and
+SYSREF comes every four multiframes, so the links run CGS and the ILAS before the data phase. The
+checks are the same, with a latency shorter than two multiframes. Every run uses scrambling.
 
 ## Adding a configuration test {#sim-add}
 
@@ -153,9 +167,10 @@ The first assertion checks that the settings agree with F, as the converter data
 the second compares the LMFC period with the one of the standard, F*K/4 link clocks. The second
 fails for a mode with M different from L ([Known issues](#debug-known-issues)).
 
-For a data-path test of a JESD204C mode, copy `test_core_204c.py` and change the settings
-function at its top. The cores need 64-bit lanes and a converter width that holds an integer
-number of samples ([Transport layer and test patterns](#transport)).
+For a data-path test of a mode, copy `test_core.py` (JESD204B) or `test_core_204c.py` (JESD204C)
+and change the settings function at its top. The cores need 32-bit (JESD204B) or 64-bit
+(JESD204C) lanes and a converter width that is a multiple of N; they assert both
+([Transport layer and test patterns](#transport)).
 
 ## Waveforms {#sim-vcd}
 
@@ -197,8 +212,6 @@ manual](#maintenance)).
 The simulations check the logic, not the electrical link or the converter. The list below is what
 only a board, or a test yet to be written, can show.
 
-- The JESD204B cores end to end: no test runs a TX core into an RX core with SYNC~, the LMFC, CGS
-  and ILAS.
 - The unscrambled mode of the JESD204B link layer: the model of `test/model/link.py` does not
   implement it, and every link test runs with scrambling.
 - The 16-bit PHY path of the JESD204B cores, through an asynchronous FIFO and a width converter:

@@ -75,9 +75,8 @@ settings = JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
 
 For JESD204C, `JESD204CSettings` takes the same two objects and E, the number of multiblocks
 per extended multiblock (1 by default). It checks that the frames of one converter line up with
-the 256 octets of a multiblock. It also sets the JESD204C version in the physical settings object
-it receives, so give it its own object, not one shared with a `JESD204BSettings`
-([Known issues](#debug-known-issues)).
+the 256 octets of a multiblock. It sets the JESD204C version on a copy of the physical settings
+object it receives, so the same object can also serve a `JESD204BSettings`.
 
 The settings class derives the values that size the layers. The table below lists them, with
 the values it computes for the example above.

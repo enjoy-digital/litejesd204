@@ -37,10 +37,9 @@ so `converter_data_width` must give exactly that width.
 | JESD204B | 32 bits | 32 x L x N / (M x N') |
 | JESD204C | 64 bits | 64 x L x N / (M x N') |
 
-The JESD204C cores assert the lane width. The JESD204B cores do not: a wrong
-`converter_data_width` usually builds without a clear error. The lane is then padded or cut where
-it meets the 32-bit link layer, or, for a value below N, Migen rejects a zero width
-([Known issues](#debug-known-issues)).
+The transport layers assert that `converter_data_width` is a non-zero multiple of N, and the four
+cores assert the lane width. The message of a failed lane assertion gives the lane width the
+value builds and the `converter_data_width` that fits, with L, M, N and N'.
 
 ## Mapping {#tr-mapping}
 
@@ -111,9 +110,8 @@ high octet and the sample index in the low octet. With `stpl_random` set (the de
 goes through a multiplication that spreads the bits over 16 bits; otherwise the seed is the
 value.
 
-The generator cuts the value to N bits. The checker compares with the full 16-bit value, so with
-N under 16 it only works with `stpl_random` cleared ([Known issues](#debug-known-issues)). Both
-ends must use the same setting.
+The generator and the checker both cut the value to N bits, so the pattern works for any N with
+`stpl_random` set or cleared. Both ends must use the same setting.
 
 ```python
 def seed_to_data(seed, random=True):
@@ -121,12 +119,13 @@ def seed_to_data(seed, random=True):
 ```
 
 The checker increments its 32-bit `errors` counter by one for each link clock in which at least
-one sample differs. Software cannot clear the counter; only a reset of the `jesd` domain does. It
-also counts while the checker is not selected, since its input is then zero, which differs from
-the pattern in practice.
+one sample differs, while its `enable` input is set; its `clear` input sets the counter to 0. The
+RX core drives `enable` with `stpl_enable` and `ready`, so the counter only counts while the
+pattern is selected and the lanes carry data, and drives `clear` on the rising edge of
+`stpl_enable`: each test starts from 0.
 
 To test a link, enable the pattern at both ends, wait for the link to be ready, then read
-`stpl_errors` twice: a link without error keeps the same value.
+`stpl_errors`: a link without error reads 0.
 
 The pattern is the formula above, so the checker passes against a TX core of this project or
 against a source programmed with the same sample values. The generator has an `errors` signal

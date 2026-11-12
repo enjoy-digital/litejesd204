@@ -35,7 +35,9 @@ bridge.](integ_soc.svg)
 The design below was elaborated to Verilog with LiteX, LiteICLink and LiteX-Boards from their
 default branches, without Vivado ([Build](#integ-build)). It has not been built into a bitstream
 or run on a board for this manual. The pins of the converter card are placeholders: take them
-from the schematic of your card.
+from the schematic of your card. For a design that builds as is, without a converter card,
+`examples/kc705_gtx.py` loops one GTX lane on the SFP cage from TX to RX
+([Examples and boards](#examples)).
 
 ```python
 _jesd_io = [
@@ -287,9 +289,9 @@ self.jesd_rx.register_jref(sysref)
 Each lane carries 32 bits per link clock, so the M converters share 32 x L bits per cycle. The
 example gives 32 bits to each converter, two 16-bit samples per cycle.
 
-`converter_data_width` must be exactly 32 x L / M x N / N', 32 here. A value below N fails at
-construction; any other wrong value builds a core whose lanes are not 32 bits wide
-([Known issues](#debug-known-issues)).
+`converter_data_width` must be exactly 32 x L / M x N / N', 32 here. Any other value fails at
+construction: the transport layer asserts a non-zero multiple of N, and the core asserts 32-bit
+lanes with a message that gives the value that fits.
 
 The user logic reads the samples on `self.jesd_rx.source` and writes them on
 `self.jesd_tx.sink`, in the `jesd` domain. Both are records with one field per converter,
@@ -305,14 +307,13 @@ A control module per core gives software its enable, its status and its test pat
 The RX module of the example also exposes the per-lane status.
 
 ```python
-self.jesd_tx_control = LiteJESD204BCoreControl(self.jesd_tx, sys_clk_freq)
-self.jesd_rx_control = LiteJESD204BCoreControl(self.jesd_rx, sys_clk_freq,
-    with_lane_status=True)
+self.jesd_tx_control = LiteJESD204BCoreControl(self.jesd_tx)
+self.jesd_rx_control = LiteJESD204BCoreControl(self.jesd_rx, with_lane_status=True)
 ```
 
 The register names start with the name of the module: `jesd_tx_control_control`,
 `jesd_rx_control_status`. The PHY registers start with `jesd_phy0` to `jesd_phy3`. The control
-module accepts `sys_clk_freq` but does not use it ([Known issues](#debug-known-issues)).
+module also accepts a `sys_clk_freq` argument, optional and unused, for older designs.
 [Register reference](#registers) lists every field.
 
 ## Step 7: build {#integ-build}
@@ -362,7 +363,8 @@ The steps are:
 5. **Link.** Wait for `ready` in `status`. In JESD204B, `sync_n` reads 1 once code group
    synchronization is complete.
 6. **Test pattern.** Set `stpl_enable` on both sides of a link, put the converter in its matching
-   test mode, and read `stpl_errors` twice: the count must not move.
+   test mode, and read `stpl_errors`: it clears when `stpl_enable` is set and stays 0 on a link
+   without error.
 
 The script below runs these register steps from a host, through `litex_server --uart`. It was
 written against the register map of the example and has not been run on a board for this
@@ -412,7 +414,7 @@ all of them.
 | `status` | `sync_n` | 1 | Level of SYNC~ in the core |
 | `status` | `skew_fifo` | 8-15 | RX: fill level of the lane 0 skew FIFO |
 | `stpl_enable` | `enable` | 0 | Test pattern instead of samples |
-| `stpl_errors` | | 0-31 | RX: link clocks with a wrong sample, never cleared |
+| `stpl_errors` | | 0-31 | RX: link clocks with a wrong sample, cleared when STPL is enabled |
 | `lmfc` | `load_on_sysref` | 0-3 | LMFC value loaded on a SYSREF edge |
 
 When `ready` does not come, [Debugging](#debugging) gives the checks in order, starting with
@@ -455,7 +457,7 @@ The repository has no generator script. To use a core outside a LiteX SoC, elabo
 `run=False`. The Verilog of the `gateware` directory then serves as a module of the larger design.
 
 `csr.csv` gives the register addresses on the CSR bus; the `Builder` can also export them as JSON
-or a C header. Its SVD export fails on the `lmfc` register, whose reset value is not a constant.
+or a C header, or as SVD.
 
 ## Migration from LiteJESD204B {#integ-migration}
 

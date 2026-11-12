@@ -235,9 +235,9 @@ In LiteJESD204, `JESD204BSettings.get_configuration_data` builds the 14 octets f
 PHADJ, CF and HD are always 0, and SUBCLASSV is always 1.
 
 CS is copied from the `cs` setting, but the transport layer never inserts control bits: keep
-`cs=0`. The field table of `common.py` gives some widths as end bit positions and places HD at bit
-5 instead of bit 7. This is harmless for the values the core writes, but the table is not reliable
-to parse received octets ([Known issues](#debug-known-issues)).
+`cs=0` ([Known issues](#debug-known-issues)). The field table of `common.py`
+(`configuration_data_fields`) gives the octet, bit offset and width of every field as in the
+figure, HD at bit 7 of octet 10.
 
 ## Lane alignment and deskew {#primer-deskew}
 

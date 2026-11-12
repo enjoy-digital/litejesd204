@@ -1,33 +1,63 @@
 # Examples and boards {#examples}
 
 This chapter lists the designs to start from: the simulations of the repository, the integration
-designs of this manual, and the earlier public examples. It ends with the boards of LiteX-Boards
-that have converter pins. The repository itself has no example directory and no board target.
+designs of this manual, the example design of the repository and the earlier public examples. It
+ends with the boards of LiteX-Boards that have converter pins.
 
 ## At a glance {#ex-glance}
 
 | Example | Where | Standard | Hardware |
 |-------------------------|---------------------------------------|----------|--------------------|
+| Core loopback | `test/test_core.py` | 204B | None, simulation |
 | Core loopback | `test/test_core_204c.py` | 204C | None, simulation |
 | Link datapath loopback | `test/test_link.py` | 204B | None, simulation |
+| KC705 GTX loopback | `examples/kc705_gtx.py` ([below](#ex-kc705-gtx)) | 204B | KC705, GTX on SFP |
 | KC705 converter card design | [Integration](#integration) | 204B | KC705, GTX |
 | AD937x design on 7-Series | [This chapter](#ex-ad937x) | 204B | 7-Series GTX or GTP |
 | AD9154 settings | `MEMO` | 204B | KC705 or KCU105, AD9154 card |
 
-The two simulations run with the test suite ([Getting started](#getting-started)). The two
-LiteX designs were elaborated to Verilog for this manual but not built into a bitstream. The
-hardware status of each standard and family is in the [status table](#intro-status).
+The simulations run with the test suite ([Getting started](#getting-started)), which also
+elaborates `examples/kc705_gtx.py`. The LiteX designs were elaborated to Verilog for this manual
+but not built into a bitstream. The hardware status of each standard and family is in the
+[status table](#intro-status).
 
 ## Simulations {#ex-sim}
 
-The JESD204C core loopback is the most complete example in the repository. It builds a TX core
-and an RX core with two lanes, loops them through stand-in PHYs, and checks the test pattern and the
-latency of a ramp. [Run a core loopback](#gs-loopback) prints what it records.
+The core loopbacks are the most complete simulations of the repository. Each builds a TX core and
+an RX core with two lanes, loops them through stand-in PHYs, and checks the test pattern and the
+latency of a ramp. The JESD204C one has four converters, E = 1 and E = 2; the JESD204B one has two
+converters, F = 2 and F = 4, with SYNC~ from the RX core to the TX core, CGS and ILAS.
+[Run a core loopback](#gs-loopback) prints what the JESD204C one records.
 
-The JESD204B examples stop at the link layer. `test_link_loopback` connects a TX link datapath to
-an RX link datapath, four octets per clock. `test_transport_loopback` connects the TX and RX
-transport layers. Neither includes the code group synchronization, the ILAS or the cores; the
-tests are listed in [Simulation and tests](#simulation).
+`test_link_loopback` connects a TX link datapath to an RX link datapath, four octets per clock,
+and `test_transport_loopback` the TX and RX transport layers; the tests are listed in
+[Simulation and tests](#simulation).
+
+## KC705 GTX loopback {#ex-kc705-gtx}
+
+`examples/kc705_gtx.py` is a complete JESD204B design without a converter: a TX core and an RX
+core on one GTX transceiver of the KC705 SFP cage, TX looped back to RX through an SFP loopback
+module or a fiber. The core controls and the GTX controls (PRBS, polarity, near-end loopback) are
+reached over a UART bridge.
+
+| Item | Value |
+|-----------------------|------------------------------------------------------------|
+| Mode | L = 1, M = 1, N = N' = 16, F = 2, S = 1, K = 32 |
+| Line rate | 5 Gbps by default (`--linerate`), 125 MHz SGMII reference clock |
+| PHY | LiteICLink `GTX`, 40-bit interface, TX and RX buffers on |
+| `jesd` clock | The GTX TX user clock, line rate / 40 |
+| SYSREF | Periodic pulse made in the `jesd` domain, every 8 multiframes |
+| SYNC~ | The RX core drives the TX core |
+| Samples | Ramp on converter 0 when the STPL is off |
+| LEDs | TX `ready`, RX `ready`, SYNC~ |
+
+Without arguments, the script writes the Verilog, the constraints and `csr.csv` to
+`build/xilinx_kc705`, without vendor tools; `--build` runs Vivado and `--load` loads the
+bitstream. Its header gives the `litex_cli` writes that enable both cores in STPL mode. The design
+is elaborated by the test suite (`test/test_examples.py`) and has not been run on hardware.
+
+In a converter design, the `jesd` clock comes from the clock chip, SYSREF and SYNC~ from and to
+pads, as in [Integration](#integration).
 
 ## AD937x design on 7-Series {#ex-ad937x}
 
@@ -138,7 +168,8 @@ LiteJESD204 does not send: HD is always 0.
 
 ## Boards {#ex-boards}
 
-No LiteX-Boards target instantiates the core. The boards in the examples above, the KC705 and
+No LiteX-Boards target instantiates the core; `examples/kc705_gtx.py` is the board design of the
+repository. The boards in the examples above, the KC705 and
 the KCU105, have transceivers on their FMC connectors; the converter card brings the converter,
 its clock chip and the pins of SYSREF and SYNC~.
 

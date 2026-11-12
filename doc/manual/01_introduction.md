@@ -86,7 +86,7 @@ not come up. LiteJESD204 is an open alternative with three goals.
 | JESD204C link | 64b/66b blocks, scrambling, CRC-12 sync words, sync header lock with PHY slip, extended multiblock lock, CRC error pulses |
 | Cores | TX and RX cores per standard, LMFC or LEMC counter reset by SYSREF, clock domain crossing to the PHYs, lane deskew FIFOs |
 | Control | Register block per core: enable, status, test pattern, LMFC or LEMC load value, optional per-lane status |
-| Verification | Unit tests of each layer against Python models; JESD204C core loopback tests |
+| Verification | Unit tests of each layer against Python models; JESD204B and JESD204C core loopback tests; elaboration of the example design |
 
 ## Status {#intro-status}
 
@@ -100,6 +100,7 @@ document records, and the last one the record.
 | JESD204B cores, 7-Series GTP | Validated on hardware | Not recorded publicly | None |
 | JESD204B cores, UltraScale and UltraScale+ GTH and GTY | Validated on hardware | KCU105 with an AD9154 board, L = 8, in the notes of `MEMO`; no result recorded | `MEMO`, `5afa985` |
 | JESD204C cores | In development | "JESD204C on UltraScale+, 4 lanes at 16.22016Gbps" | `README.md` |
+| KC705 example design, JESD204B on GTX | In development | None: elaborated by the tests, not run on hardware | None |
 | STPL, ILAS check, lane status | Status of their core | As their core | As their core |
 
 The status words mean:
@@ -115,9 +116,12 @@ block; it does not lower its status. Beyond the table, a public issue of the rep
 reports a JESD204B link up on an AD9174 DAC after a fix of the ILAS counter octets, without naming
 the FPGA.
 
-The `README.md` line of the JESD204C row is quoted as written. The same file names a
-`gth4_ultrascale_64b66b` wrapper of LiteICLink, which is not on the LiteICLink default branch.
-[JESD204C link layer](#link-204c) gives the PHY contract that such a wrapper must meet.
+The KC705 example design is `examples/kc705_gtx.py`, a JESD204B TX core looped back to an RX
+core on one GTX lane ([Examples and boards](#ex-kc705-gtx)).
+
+The `README.md` line of the JESD204C row is quoted as written. The README also notes that no
+64b/66b wrapper of LiteICLink is merged yet; [JESD204C link layer](#link-204c) gives the PHY
+contract that such a wrapper must meet.
 
 ## What it is not {#intro-limits}
 
@@ -162,6 +166,7 @@ use `LiteJESD204C`. [Integration](#integration) gives the migration steps.
 | `litejesd204/link_204c.py` | JESD204C link layer |
 | `litejesd204/core_204c.py` | JESD204C cores and control module |
 | `litejesd204b/` | Compatibility package for the old name |
+| `examples/` | Example design: JESD204B on a KC705 GTX, TX looped back to RX |
 | `test/` | Unit and loopback tests (pytest), Python models in `test/model/` |
 | `MEMO` | Notes on the JESD204B parameters and character insertion |
 | `doc/` | This manual (`doc/manual/`), its figures (`doc/diagrams/`), logos |
