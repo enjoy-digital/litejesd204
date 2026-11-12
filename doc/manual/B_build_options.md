@@ -34,8 +34,8 @@ the TX and the RX core of a link ([JESD204 in a nutshell](#jesd204-primer)).
 two arguments.
 
 The physical settings fix the subclass to 1 and the JESD204 version to 204B.
-`JESD204CSettings` sets the version to 204C in the physical settings object it receives, so give
-it its own object, and forces `framing` to `False`. The ILAS advertises CS, but the transport
+`JESD204CSettings` sets the version to 204C on its own copy of the physical settings, so the
+object it receives is left unchanged, and forces `framing` to `False`. The ILAS advertises CS, but the transport
 layer inserts no control bits; CF and HD are always 0.
 
 The settings derive these values, used by the cores:
@@ -71,16 +71,18 @@ The four cores take the arguments below; `ilas_check` exists on the JESD204B RX 
 | All | `converter_data_width` | required | Bits per converter and link clock |
 | All | `scrambling` | `True` | 204B: scrambler of the datapath; 204C: no effect |
 | All | `stpl_random` | `True` | Pseudo-random STPL values, else the seeds |
-| 204B RX | `ilas_check` | `True` | Reset value of the ILAS check |
+| 204B RX | `ilas_check` | `True` | Reset value of the ILAS check, and of the control field |
 
 The converter port carries `converter_data_width // N` samples per link clock. The lanes of the
 transport layer are then that number of samples times N' times M/L bits wide, and the cores need
-32-bit lanes for JESD204B and 64-bit lanes for JESD204C. The JESD204C cores assert this width;
-the JESD204B cores do not check it ([Known issues](#debug-known-issues)).
+32-bit lanes for JESD204B and 64-bit lanes for JESD204C. The transport layers assert that
+`converter_data_width` is a non-zero multiple of N, and the four cores assert the lane width; the
+message of the lane assertion gives the value that fits, 32 (or 64) x L / M x N / N'.
 
 With the default `scrambling`, the JESD204B datapath scrambles; the SCR bit of the ILAS comes from
 the settings, so give both the same value. The JESD204C links take scrambling from
-`JESD204CSettings` only. The control module overrides `ilas_check` with its own field.
+`JESD204CSettings` only. With a control module, the `ilas_check_disable` field drives the check;
+its reset value is 1 when the core is built with `ilas_check=False`.
 
 | Method | Cores | Argument | Effect |
 |-------------------------------|------------------|--------------------------|--------------------------------------|
@@ -100,14 +102,15 @@ as its first argument.
 | Classes | Argument | Default | Effect |
 |------------|-------------------------------------------------|--------------|-------------------------|
 | Both | `core` | required | Core to control |
-| Both | `sys_clk_freq` | required | Unused |
+| Both | `sys_clk_freq` | `None` | Unused, kept for compatibility |
 | Both | `default_enable` | `0` | Reset value of the enable field |
 | Both | `default_stpl_enable` | `0` | Reset value of `stpl_enable` |
 | 204B | `default_ilas_check_disable` | `0` | Reset value of the ILAS check disable field |
 | 204B | `with_lane_status` | `False` | Adds the lane status registers (RX) |
 
 "Both" stands for `LiteJESD204BCoreControl` and `LiteJESD204CCoreControl`, "204B" for the first
-only. The lane status registers are `skew_levels`, `skew_overflows` and `lane_align`. With
+only. The ILAS check disable field also resets to 1 when the RX core is built with
+`ilas_check=False`. The lane status registers are `skew_levels`, `skew_overflows` and `lane_align`. With
 `default_enable=1`, the core starts after reset without software.
 
 ## Constants of the link layers {#opt-link}

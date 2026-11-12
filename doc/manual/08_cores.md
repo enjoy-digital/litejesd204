@@ -39,12 +39,13 @@ core = LiteJESD204BCoreRX(phys, settings, converter_data_width=32,
 | `jesd_settings` | All | | `JESD204BSettings` or `JESD204CSettings` |
 | `converter_data_width` | All | | Bits per converter field ([Transport](#tr-records)) |
 | `scrambling` | All | `True` | JESD204B scrambling; no effect in JESD204C |
-| `ilas_check` | B RX | `True` | Initial value of the ILAS check |
+| `ilas_check` | B RX | `True` | Initial value of the ILAS check, kept by a control module |
 | `stpl_random` | All | `True` | Test pattern values ([Test patterns](#tr-stpl)) |
 
 In JESD204C, the scrambling follows the `scrambling` setting of `JESD204CSettings`
-([Limitations](#lc-limitations)). With a control module, the `control` register sets the ILAS
-check, whatever the value of `ilas_check` ([Control modules](#cores-control)).
+([Limitations](#lc-limitations)). With a control module, the `ilas_check_disable` field of the
+`control` register sets the ILAS check; it resets to 1, check off, when the core is built with
+`ilas_check=False` ([Control modules](#cores-control)).
 
 ## Signals {#cores-signals}
 
@@ -207,11 +208,17 @@ The JESD204B per-lane registers exist only with `with_lane_status`, on an RX cor
 register map stays the same. The register names in a SoC carry the name of the control module,
 such as `jesd_rx_control_status`. [Register reference](#registers) lists every field.
 
-The 32-bit counters, `stpl_errors` and `crc_errors`, cross to `sys` bit by bit, while they
-change: one read can mix bits of two values. Read a counter twice and use the value when two
-readings agree.
+The flags and levels cross to `sys` through `MultiReg` synchronizers. The 32-bit counters,
+`stpl_errors` and `crc_errors`, cross with a `BusSynchronizer` handshake: a read returns a value
+the counter had a few clocks earlier, never a mix of two values.
 
-`sys_clk_freq` is accepted for compatibility and not used.
+A TX control module creates the same registers as an RX one, so the register map does not depend
+on the direction. The RX only fields and registers read 0 on a TX core, and
+`ilas_check_disable` has no effect there: `skew_fifo`, `stpl_errors`, and in JESD204C
+`lane_status`, `crc_errors` and `emb_debug`. Their descriptions say so ([Register
+reference](#registers)).
+
+`sys_clk_freq` is optional (`None` by default), accepted for compatibility and not used.
 
 ## Limitations {#cores-limitations}
 
@@ -226,11 +233,8 @@ readings agree.
   wraps. When the load value plus the period does not exceed the next power of two, the counter
   never reaches 0: no boundary, a JESD204B TX core stays in CGS and a JESD204C TX core never
   becomes ready. Otherwise the boundaries come once per period, at a wrong position.
-- **TX registers.** The TX control modules also create RX fields that stay at 0: `skew_fifo`, and
-  in JESD204C `lane_status`, `crc_errors` and `emb_debug`.
 - **Lane coverage.** The per-lane registers cover lanes 0 to 3 or 0 to 7 as the table shows; the
   8-bit level fields can be narrower than a FIFO level.
-- **Counters.** The 32-bit counters cross to `sys` bit by bit (see above).
 - **Tail bits.** The transport layer places a sample with N < N' in the low bits of its word
   ([Control bits and tail bits](#tr-tail-bits)).
 

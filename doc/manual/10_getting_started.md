@@ -41,8 +41,9 @@ vendor tool or Verilator: the tests run in the Migen simulator, in Python.
 ## Step 1: run the test suite {#gs-tests}
 
 The test suite checks each layer against Python models: the transport mapping, the scrambling,
-the alignment characters, the ILAS, the JESD204C blocks and sync words, and a JESD204C core
-loopback. Run it from the root of the repository, as the continuous integration does:
+the alignment characters, the ILAS, the JESD204C blocks and sync words, the control modules, a
+JESD204B and a JESD204C core loopback, and the elaboration of the example design. Run it from the
+root of the repository, as the continuous integration does:
 
 ```sh
 python3 -m pytest -v
@@ -52,20 +53,24 @@ python3 -m pytest -v
 the repository; the list is cut.
 
 ```console
-collecting ... collected 34 items
+collecting ... collected 49 items
 
 test/test_align.py::TestAlign::test_aligner PASSED                       [  2%]
-test/test_core_204c.py::TestCore204C::test_core_loopback PASSED          [  5%]
-test/test_core_204c.py::TestCore204C::test_core_loopback_e2 PASSED       [  8%]
-test/test_ilas.py::TestILAS::test_config_data PASSED                     [ 11%]
+[...]
+test/test_core.py::TestCore::test_core_loopback PASSED                   [ 16%]
+test/test_core.py::TestCore::test_core_loopback_f4 PASSED                [ 18%]
+test/test_core_204c.py::TestCore204C::test_core_loopback PASSED          [ 20%]
+test/test_core_204c.py::TestCore204C::test_core_loopback_e2 PASSED       [ 22%]
+test/test_examples.py::TestExamples::test_kc705_gtx PASSED               [ 24%]
 [...]
 test/test_transport.py::TestTransport::test_transport_tx PASSED          [100%]
 
-======================== 34 passed in 134.43s (0:02:14) ========================
+======== 49 passed, 1 warning, 37 subtests passed in 136.59s (0:02:16) =========
 ```
 
-The run time depends on the machine. [Simulation and tests](#simulation) lists the tests by area
-and explains how to add one.
+The run time depends on the machine. The warning is the combinational cycle that LiteX reports
+when `test_examples.py` writes the Verilog of the example ([Build](#integ-build)).
+[Simulation and tests](#simulation) lists the tests by area and explains how to add one.
 
 **If not.** An import error names the missing package: `migen` or `litex` for LiteX itself,
 `litejesd204` when the repository is not installed and pytest runs from another directory.
@@ -103,13 +108,13 @@ print("latency     :", first - tx.index(rx[first]), "jesd cycles")
 EOF
 ```
 
-**What you should see.** For this manual, the script ran in under a minute and printed:
+**What you should see.** For this manual, the script ran in under 30 seconds and printed:
 
 ```console
 lemc_cycles : 32
 tx ready at : 33
 rx ready at : 234
-stpl errors : [233]
+stpl errors : [0]
 latency     : 11 jesd cycles
 ```
 
@@ -118,9 +123,9 @@ Read the lines as follows:
 - **`lemc_cycles`.** One extended multiblock lasts 32 link clock cycles: 32 blocks, E = 1.
 - **Ready times.** The TX core is ready at its first LEMC boundary after the enable. The RX core
   first needs the sync header lock, the extended multiblock lock and a common LEMC boundary.
-- **`stpl errors`.** The checker counted 233 link clocks with a wrong sample before the RX core
-  was ready, then stopped counting: one single value means no error once the link was up. It adds
-  at most one per link clock and software cannot clear it, so compare two readings.
+- **`stpl errors`.** The checker counts only while the STPL is enabled and the RX core is ready,
+  so the link clocks before `rx ready at` do not count: 0 on every read means no wrong sample once
+  the link was up. It adds at most one per link clock.
 - **Latency.** The ramp came back 11 link clock cycles after it left, on every cycle of the
   capture. The test fails if any cycle differs.
 
@@ -128,9 +133,10 @@ Read the lines as follows:
 first check. The locks and counters are described in [JESD204C link layer](#link-204c), the
 release of the lanes in [TX and RX cores](#cores).
 
-The repository has no core-level loopback test for JESD204B. The JESD204B tests stop at the link
-layer: `test_link_loopback` sends random octets through the TX and RX datapaths, with scrambling,
-framing and alignment characters, but without code group synchronization, ILAS or transceivers.
+The JESD204B core loopback, `test/test_core.py`, does the same with two lanes and two converters,
+F = 2 and F = 4. The SYNC~ output of the RX core drives the TX core, so the links go through code
+group synchronization and the ILAS before the data phase. Run it with
+`python3 -m pytest -v test/test_core.py`.
 
 ## Step 3: print the configuration data {#gs-ilas}
 
