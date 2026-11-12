@@ -119,9 +119,9 @@ the FPGA.
 The KC705 example design is `examples/kc705_gtx.py`, a JESD204B TX core looped back to an RX
 core on one GTX lane ([Examples and boards](#ex-kc705-gtx)).
 
-The `README.md` line of the JESD204C row is quoted as written. The same file names a
-`gth4_ultrascale_64b66b` wrapper of LiteICLink, which is not on the LiteICLink default branch.
-[JESD204C link layer](#link-204c) gives the PHY contract that such a wrapper must meet.
+The `README.md` line of the JESD204C row is quoted as written. The README also notes that no
+64b/66b wrapper of LiteICLink is merged yet; [JESD204C link layer](#link-204c) gives the PHY
+contract that such a wrapper must meet.
 
 ## What it is not {#intro-limits}
 
