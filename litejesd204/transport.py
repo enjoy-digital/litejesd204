@@ -8,6 +8,8 @@ from math import ceil
 
 from migen import *
 
+from litex.gen import *
+
 
 def seed_to_data(seed, random=True):
     return ((seed + 1)*0x31415979 + 1) & 0xffff if random else seed
@@ -198,23 +200,36 @@ class LiteJESD204BSTPLGenerator(Module):
 class LiteJESD204BSTPLChecker(Module):
     """Simple Transport Layer Pattern Checker
     cf section 5.1.6.2
+    errors: number of link clocks with at least one mismatching sample, counted while enable is
+    set, cleared by clear.
     """
     def __init__(self, jesd_settings, converter_data_width, random=True):
         self.sink = Record([("converter"+str(i), converter_data_width)
             for i in range(jesd_settings.nconverters)])
-        self.errors = Signal(32)
+        self.enable = Signal(reset=1) # Input:  Error counting enable.
+        self.clear  = Signal()        # Input:  Error count clear.
+        self.errors = Signal(32)      # Output: Error count.
 
         # # #
 
         samples_per_clock = converter_data_width//jesd_settings.phy.n
         samples_per_frame = jesd_settings.transport.s
 
+        # Per-sample mismatches.
+        mismatches = []
         for i in range(jesd_settings.nconverters):
             converter = getattr(self.sink, "converter"+str(i))
             for j in range(samples_per_clock):
-                data = seed_to_data((i << 8) | j%samples_per_frame, random)
-                self.sync += [
-                    If(converter[j*jesd_settings.phy.n:(j+1)*jesd_settings.phy.n] != data,
-                        self.errors.eq(self.errors + 1)
-                    )
-                ]
+                data     = seed_to_data((i << 8) | j%samples_per_frame, random)
+                mismatch = Signal()
+                self.comb += mismatch.eq(converter[j*jesd_settings.phy.n:(j+1)*jesd_settings.phy.n] != data)
+                mismatches.append(mismatch)
+
+        # Error count (link clocks with at least one mismatching sample).
+        self.sync += [
+            If(self.clear,
+                self.errors.eq(0)
+            ).Elif(self.enable & Reduce("OR", mismatches),
+                self.errors.eq(self.errors + 1)
+            )
+        ]

@@ -255,6 +255,13 @@ class LiteJESD204BCoreRX(Module):
             ).Else(
                 self.source.eq(transport.source)
             )
+        # Count errors only when STPL is enabled and the core is ready, clear them when enabling.
+        stpl_enable_d = Signal()
+        self.sync.jesd += stpl_enable_d.eq(self.stpl_enable)
+        self.comb += [
+            stpl.enable.eq(self.stpl_enable & self.ready),
+            stpl.clear.eq(self.stpl_enable & ~stpl_enable_d),
+        ]
 
         # LMFC
         lmfc = LMFC(jesd_settings.lmfc_cycles, load=-(1 + 4)) # jref + ebuf latency
@@ -401,7 +408,7 @@ class LiteJESD204BCoreControl(Module, AutoCSR):
                 ("``0b1``", "STPL test enabled.")
             ], reset=default_stpl_enable)
         ])
-        self.stpl_errors = CSRStatus(32, description="STPL test errors.")
+        self.stpl_errors = CSRStatus(32, description="STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``).")
         self.lmfc        = CSRStorage(fields=[
             CSRField("load_on_sysref", size=len(core.lmfc.load),
                 reset       = core.lmfc.load.reset,
