@@ -375,7 +375,9 @@ class LiteJESD204BCoreControl(Module, AutoCSR):
             CSRField("ilas_check_disable", size=1, offset=8, values=[
                 ("``0b0``", "Enable  RX ILAS Check."),
                 ("``0b1``", "Disable RX ILAS Check.")
-            ], reset=default_ilas_check_disable)
+            # Default: disabled if requested or if the RX core was built with ilas_check=False.
+            ], reset=default_ilas_check_disable |
+                int(hasattr(core, "ilas_check") and not core.ilas_check.reset.value))
         ])
         self.status = CSRStatus(fields=[
             CSRField("ready", size=1, offset=0, values=[
