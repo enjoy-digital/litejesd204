@@ -137,14 +137,14 @@
       "description": "LMFC reload value on SYSREF rising edge.",
       "name": "load_on_sysref",
       "offset": 0,
-      "reset": null,
+      "reset": 11,
       "size": 4,
       "values": []
      }
     ],
     "name": "lmfc",
     "offset": 16,
-    "reset": null,
+    "reset": 11,
     "size": 4
    },
    {
@@ -307,14 +307,14 @@
       "description": "LMFC reload value on SYSREF rising edge.",
       "name": "load_on_sysref",
       "offset": 0,
-      "reset": null,
+      "reset": 5,
       "size": 4,
       "values": []
      }
     ],
     "name": "lmfc",
     "offset": 16,
-    "reset": null,
+    "reset": 5,
     "size": 4
    }
   ],
@@ -425,14 +425,14 @@
       "description": "LEMC reload value on SYSREF rising edge.",
       "name": "load_on_sysref",
       "offset": 0,
-      "reset": null,
+      "reset": 27,
       "size": 5,
       "values": []
      }
     ],
     "name": "lmfc",
     "offset": 16,
-    "reset": null,
+    "reset": 27,
     "size": 5
    },
    {
@@ -604,14 +604,14 @@
       "description": "LEMC reload value on SYSREF rising edge.",
       "name": "load_on_sysref",
       "offset": 0,
-      "reset": null,
+      "reset": 5,
       "size": 5,
       "values": []
      }
     ],
     "name": "lmfc",
     "offset": 16,
-    "reset": null,
+    "reset": 5,
     "size": 5
    },
    {
