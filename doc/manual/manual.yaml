@@ -1,0 +1,25 @@
+# Manual of this project: output name and chapters, in order (read by build.py; the pandoc defaults
+# files and the theme are generic, from the manual kit).
+name: litejesd204_manual
+chapters:
+  - 00_front.md
+  - 01_introduction.md
+  - 02_jesd204_primer.md
+  - 03_jesd204c_primer.md
+  - 04_architecture.md
+  - 05_transport.md
+  - 06_link_204b.md
+  - 07_link_204c.md
+  - 08_cores.md
+  - 09_phys.md
+  - 10_getting_started.md
+  - 11_integration.md
+  - 12_examples.md
+  - 13_simulation.md
+  - 14_debugging.md
+  - Z_appendix.md
+  - A_registers.md
+  - B_build_options.md
+  - C_glossary.md
+  - D_performance.md
+  - E_maintenance.md

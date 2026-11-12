@@ -1,0 +1,682 @@
+{
+ "argv": [
+  "L=4 M=4 F=2 S=1 K=32 N=N'=16",
+  "E=1 (204C)",
+  "with_lane_status=True (204B RX)"
+ ],
+ "banks": {
+  "jesd204b_rx": [
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: links out of reset, the core runs. 0: links held in reset.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core disabled."
+       ],
+       [
+        "``0b1``",
+        "JESD core enabled."
+       ]
+      ]
+     },
+     {
+      "description": "1: the RX links accept an ILAS that differs from the expected one. No effect on a TX core.",
+      "name": "ilas_check_disable",
+      "offset": 8,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "Enable  RX ILAS Check."
+       ],
+       [
+        "``0b1``",
+        "Disable RX ILAS Check."
+       ]
+      ]
+     }
+    ],
+    "name": "control",
+    "offset": 0,
+    "reset": 0,
+    "size": 9
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: every link of the core is synchronized and carries data.",
+      "name": "ready",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core not ready, all links are not synchronized."
+       ],
+       [
+        "``0b1``",
+        "JESD core ready, all links are synchronized."
+       ]
+      ]
+     },
+     {
+      "description": "JESD ``SYNC~`` status.",
+      "name": "sync_n",
+      "offset": 1,
+      "reset": 0,
+      "size": 1,
+      "values": []
+     },
+     {
+      "description": "JESD Skew FIFO level (``RX only``).",
+      "name": "skew_fifo",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "status",
+    "offset": 4,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: the STPL generator (TX) or checker (RX) replaces the converter port.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "STPL test disabled."
+       ],
+       [
+        "``0b1``",
+        "STPL test enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "stpl_enable",
+    "offset": 8,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "STPL test errors.",
+    "fields": [],
+    "name": "stpl_errors",
+    "offset": 12,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "LMFC reload value on SYSREF rising edge.",
+      "name": "load_on_sysref",
+      "offset": 0,
+      "reset": null,
+      "size": 4,
+      "values": []
+     }
+    ],
+    "name": "lmfc",
+    "offset": 16,
+    "reset": null,
+    "size": 4
+   },
+   {
+    "access": "ro",
+    "description": "Per-lane Skew FIFO levels, 8-bit per lane, lane0 in bits [7:0] (``RX only``).",
+    "fields": [],
+    "name": "skew_levels",
+    "offset": 20,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "ro",
+    "description": "Per-lane sticky Skew FIFO overflow flags, cleared on link resync (``RX only``).",
+    "fields": [],
+    "name": "skew_overflows",
+    "offset": 24,
+    "reset": null,
+    "size": 8
+   },
+   {
+    "access": "ro",
+    "description": "Per-lane byte alignment in bits [7:0] (2-bit per lane) and sticky realign flags in bits [11:8], cleared on link resync (``RX only``).",
+    "fields": [],
+    "name": "lane_align",
+    "offset": 28,
+    "reset": null,
+    "size": 16
+   }
+  ],
+  "jesd204b_tx": [
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: links out of reset, the core runs. 0: links held in reset.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core disabled."
+       ],
+       [
+        "``0b1``",
+        "JESD core enabled."
+       ]
+      ]
+     },
+     {
+      "description": "1: the RX links accept an ILAS that differs from the expected one. No effect on a TX core.",
+      "name": "ilas_check_disable",
+      "offset": 8,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "Enable  RX ILAS Check."
+       ],
+       [
+        "``0b1``",
+        "Disable RX ILAS Check."
+       ]
+      ]
+     }
+    ],
+    "name": "control",
+    "offset": 0,
+    "reset": 0,
+    "size": 9
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: every link of the core is synchronized and carries data.",
+      "name": "ready",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core not ready, all links are not synchronized."
+       ],
+       [
+        "``0b1``",
+        "JESD core ready, all links are synchronized."
+       ]
+      ]
+     },
+     {
+      "description": "JESD ``SYNC~`` status.",
+      "name": "sync_n",
+      "offset": 1,
+      "reset": 0,
+      "size": 1,
+      "values": []
+     },
+     {
+      "description": "JESD Skew FIFO level (``RX only``).",
+      "name": "skew_fifo",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "status",
+    "offset": 4,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: the STPL generator (TX) or checker (RX) replaces the converter port.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "STPL test disabled."
+       ],
+       [
+        "``0b1``",
+        "STPL test enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "stpl_enable",
+    "offset": 8,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "STPL test errors.",
+    "fields": [],
+    "name": "stpl_errors",
+    "offset": 12,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "LMFC reload value on SYSREF rising edge.",
+      "name": "load_on_sysref",
+      "offset": 0,
+      "reset": null,
+      "size": 4,
+      "values": []
+     }
+    ],
+    "name": "lmfc",
+    "offset": 16,
+    "reset": null,
+    "size": 4
+   }
+  ],
+  "jesd204c_rx": [
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: links out of reset, the core runs. 0: links held in reset.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core disabled."
+       ],
+       [
+        "``0b1``",
+        "JESD core enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "control",
+    "offset": 0,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: every link of the core is synchronized and carries data.",
+      "name": "ready",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core not ready, all links are not synchronized."
+       ],
+       [
+        "``0b1``",
+        "JESD core ready, all links are synchronized."
+       ]
+      ]
+     },
+     {
+      "description": "JESD Skew FIFO level (``RX only``).",
+      "name": "skew_fifo",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "status",
+    "offset": 4,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: the STPL generator (TX) or checker (RX) replaces the converter port.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "STPL test disabled."
+       ],
+       [
+        "``0b1``",
+        "STPL test enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "stpl_enable",
+    "offset": 8,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "STPL test errors.",
+    "fields": [],
+    "name": "stpl_errors",
+    "offset": 12,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "LEMC reload value on SYSREF rising edge.",
+      "name": "load_on_sysref",
+      "offset": 0,
+      "reset": null,
+      "size": 5,
+      "values": []
+     }
+    ],
+    "name": "lmfc",
+    "offset": 16,
+    "reset": null,
+    "size": 5
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "Per-lane sync header lock (``RX only``).",
+      "name": "sh_lock",
+      "offset": 0,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     },
+     {
+      "description": "Per-lane extended multiblock lock (``RX only``).",
+      "name": "emb_lock",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "lane_status",
+    "offset": 20,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "ro",
+    "description": "Accumulated CRC-12 errors, all lanes (``RX only``).",
+    "fields": [],
+    "name": "crc_errors",
+    "offset": 24,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``).",
+      "name": "state",
+      "offset": 0,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     },
+     {
+      "description": "Per-lane sticky EoMB-detected flag (``RX only``).",
+      "name": "eomb_seen",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "emb_debug",
+    "offset": 28,
+    "reset": null,
+    "size": 16
+   }
+  ],
+  "jesd204c_tx": [
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: links out of reset, the core runs. 0: links held in reset.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core disabled."
+       ],
+       [
+        "``0b1``",
+        "JESD core enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "control",
+    "offset": 0,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: every link of the core is synchronized and carries data.",
+      "name": "ready",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "JESD core not ready, all links are not synchronized."
+       ],
+       [
+        "``0b1``",
+        "JESD core ready, all links are synchronized."
+       ]
+      ]
+     },
+     {
+      "description": "JESD Skew FIFO level (``RX only``).",
+      "name": "skew_fifo",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "status",
+    "offset": 4,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "1: the STPL generator (TX) or checker (RX) replaces the converter port.",
+      "name": "enable",
+      "offset": 0,
+      "reset": 0,
+      "size": 1,
+      "values": [
+       [
+        "``0b0``",
+        "STPL test disabled."
+       ],
+       [
+        "``0b1``",
+        "STPL test enabled."
+       ]
+      ]
+     }
+    ],
+    "name": "stpl_enable",
+    "offset": 8,
+    "reset": 0,
+    "size": 1
+   },
+   {
+    "access": "ro",
+    "description": "STPL test errors.",
+    "fields": [],
+    "name": "stpl_errors",
+    "offset": 12,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "rw",
+    "description": "",
+    "fields": [
+     {
+      "description": "LEMC reload value on SYSREF rising edge.",
+      "name": "load_on_sysref",
+      "offset": 0,
+      "reset": null,
+      "size": 5,
+      "values": []
+     }
+    ],
+    "name": "lmfc",
+    "offset": 16,
+    "reset": null,
+    "size": 5
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "Per-lane sync header lock (``RX only``).",
+      "name": "sh_lock",
+      "offset": 0,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     },
+     {
+      "description": "Per-lane extended multiblock lock (``RX only``).",
+      "name": "emb_lock",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "lane_status",
+    "offset": 20,
+    "reset": null,
+    "size": 16
+   },
+   {
+    "access": "ro",
+    "description": "Accumulated CRC-12 errors, all lanes (``RX only``).",
+    "fields": [],
+    "name": "crc_errors",
+    "offset": 24,
+    "reset": null,
+    "size": 32
+   },
+   {
+    "access": "ro",
+    "description": "",
+    "fields": [
+     {
+      "description": "EMB FSM state of lanes 0-3, 2-bit per lane: 0=INIT, 1=HUNT, 2=LOCK (``RX only``).",
+      "name": "state",
+      "offset": 0,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     },
+     {
+      "description": "Per-lane sticky EoMB-detected flag (``RX only``).",
+      "name": "eomb_seen",
+      "offset": 8,
+      "reset": 0,
+      "size": 8,
+      "values": []
+     }
+    ],
+    "name": "emb_debug",
+    "offset": 28,
+    "reset": null,
+    "size": 16
+   }
+  ]
+ },
+ "config": "kc705_stand_in",
+ "target": "xilinx_kc705"
+}

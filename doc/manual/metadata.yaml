@@ -1,0 +1,16 @@
+---
+# Project metadata of the manual (title page, headers, document properties). The theme (colours,
+# fonts, LaTeX options) is in theme.yaml; build.py merges both and replaces @DATE@.
+title: "JESD204B & JESD204C Converter Links"
+project: "LiteJESD204"
+subtitle: "Reference manual of the LiteX JESD204B/JESD204C core: transport, link layers, TX/RX cores and integration"
+author: [Enjoy-Digital]
+date: "@DATE@"
+license: "Copyright © 2016-2026 Enjoy-Digital. Licensed under the BSD-2-Clause license."
+license-short: "BSD-2-Clause"
+contact: "hello@enjoy-digital.fr"
+website: "enjoy-digital.fr"
+subject: "LiteJESD204"
+lang: en-US
+header-right: "JESD204B \\& JESD204C Converter Links · BSD-2-Clause · \\href{mailto:hello@enjoy-digital.fr}{hello@enjoy-digital.fr}"
+---
