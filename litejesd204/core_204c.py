@@ -116,13 +116,12 @@ class LiteJESD204CCoreTX(Module):
             cdc = LiteJESD204CTXCDC(phy, phy_cd)
             setattr(self.submodules, "cdc"+str(n), cdc)
 
-            link = LiteJESD204CLinkTX(jesd_settings)
+            link = LiteJESD204CLinkTX(jesd_settings, scrambling=scrambling and jesd_settings.scrambling)
             link = ClockDomainsRenamer("jesd")(link)
             self.submodules += link
             links.append(link)
             self.comb += [
                 link.reset.eq(~self.enable),
-                link.scrambler.enable.eq(int(scrambling)),
                 link.lemc_zero.eq(lmfc.zero),
             ]
 
@@ -214,13 +213,12 @@ class LiteJESD204CCoreRX(Module):
             cdc = LiteJESD204CRXCDC(phy, phy_cd)
             setattr(self.submodules, "cdc"+str(n), cdc)
 
-            link = LiteJESD204CLinkRX(jesd_settings)
+            link = LiteJESD204CLinkRX(jesd_settings, scrambling=scrambling and jesd_settings.scrambling)
             link = ClockDomainsRenamer("jesd")(link)
             self.submodules += link
             links.append(link)
             self.comb += [
                 link.reset.eq(~self.enable),
-                link.descrambler.enable.eq(int(scrambling)),
                 link.sh_lock.eq(sh_lock),
             ]
 
