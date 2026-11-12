@@ -27,8 +27,8 @@ of components used in today's SoC such as Ethernet, SATA, PCIe, SDRAM Controller
 
 Using Migen to describe the HDL allows the core to be highly and easily configurable.
 
-LiteJESD204 can be used as LiteX library or can be integrated with your standard
-design flow by generating the verilog rtl that you will use as a standard core.
+LiteJESD204 is used as a LiteX library: designs instantiate its cores in a LiteX SoC or in a
+Migen module (there is no standalone Verilog generator).
 
 LiteJESD204 was previously named LiteJESD204B, see the migration section below.
 
@@ -74,6 +74,27 @@ LiteJESD204 is already used in commercial and open-source designs:
 
 If you want to support these features, please contact us at florent [AT]
 enjoy-digital.fr.
+
+[> Documentation
+----------------
+The **JESD204B & JESD204C Converter Links manual** is the reference of LiteJESD204: a nightly
+[PDF](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.pdf)
+and [HTML page](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.html)
+are published on the [manual-nightly](https://github.com/enjoy-digital/litejesd204/releases/tag/manual-nightly)
+release. Sources in [doc/manual](doc/manual/README.md) (build: `python3 doc/manual/build.py`, outputs in
+`build/doc/`; pandoc, XeLaTeX and the fonts listed in the README of `doc/manual`):
+
+- **Understand**: [introduction](doc/manual/01_introduction.md), [JESD204 in a nutshell](doc/manual/02_jesd204_primer.md),
+  [JESD204C and 64b/66b](doc/manual/03_jesd204c_primer.md).
+- **The core**: [architecture](doc/manual/04_architecture.md), [transport layer](doc/manual/05_transport.md),
+  [JESD204B link layer](doc/manual/06_link_204b.md), [JESD204C link layer](doc/manual/07_link_204c.md),
+  [TX and RX cores](doc/manual/08_cores.md), [PHYs](doc/manual/09_phys.md).
+- **Use it**: [getting started](doc/manual/10_getting_started.md), [integration](doc/manual/11_integration.md),
+  [examples](doc/manual/12_examples.md), [simulation](doc/manual/13_simulation.md),
+  [debugging](doc/manual/14_debugging.md).
+- **Appendices**: [registers](doc/manual/A_registers.md), [build options](doc/manual/B_build_options.md),
+  [glossary](doc/manual/C_glossary.md), [performance and resources](doc/manual/D_performance.md),
+  [maintaining this manual](doc/manual/E_maintenance.md).
 
 [> Getting started
 ------------------
