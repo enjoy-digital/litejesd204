@@ -118,6 +118,8 @@ class LMFC(Module):
             _jref_d.eq(_jref),
             If(_jref & ~_jref_d,
                 self.count.eq(self.load)
+            ).Elif(self.count == (lmfc_cycles - 1),
+                self.count.eq(0)
             ).Else(
                 self.count.eq(self.count + 1)
             )
