@@ -575,7 +575,7 @@ class LiteJESD204BLinkTX(Module):
 
         # Datapath
         datapath = LiteJESD204BLinkTXDatapath(data_width,
-            jesd_settings.octets_per_frame,
+            jesd_settings.octets_per_lane,
             jesd_settings.transport.k)
         self.submodules.datapath = datapath
         self.comb += datapath.sink.eq(sink)
@@ -682,7 +682,7 @@ class LiteJESD204BLinkRX(Module):
 
         # Datapath
         datapath = LiteJESD204BLinkRXDatapath(data_width,
-            jesd_settings.octets_per_frame,
+            jesd_settings.octets_per_lane,
             jesd_settings.transport.k)
         self.submodules.datapath = datapath
         self.comb += source.eq(datapath.source)
