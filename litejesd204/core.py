@@ -6,7 +6,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from migen import *
-from migen.genlib.cdc import MultiReg
+from migen.genlib.cdc import MultiReg, BusSynchronizer
 from migen.genlib.fifo import SyncFIFO
 
 from litex.gen import *
@@ -417,9 +417,14 @@ class LiteJESD204BCoreControl(Module, AutoCSR):
             MultiReg(self.control.fields.enable,      core.enable,      "jesd"),
             MultiReg(self.stpl_enable.storage,        core.stpl_enable, "jesd"),
             MultiReg(self.lmfc.fields.load_on_sysref, core.lmfc.load,   "jesd"),
-            MultiReg(core.stpl.errors, self.stpl_errors.status,   "sys"),
             MultiReg(core.ready,       self.status.fields.ready,  "sys"),
             MultiReg(core.jsync,       self.status.fields.sync_n, "sys"),
+        ]
+        # Error counter: multi-bit word crossed with a handshake (consistent values).
+        self.submodules.stpl_errors_cdc = BusSynchronizer(32, "jesd", "sys")
+        self.comb += [
+            self.stpl_errors_cdc.i.eq(core.stpl.errors),
+            self.stpl_errors.status.eq(self.stpl_errors_cdc.o),
         ]
         if hasattr(core, "skew_fifos"):
             self.specials += MultiReg(core.skew_fifos[0].level, self.status.fields.skew_fifo)
