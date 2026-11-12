@@ -5,7 +5,7 @@
 # SPDX-License-Identifier: BSD-2-Clause
 
 from migen import *
-from migen.genlib.cdc import MultiReg
+from migen.genlib.cdc import MultiReg, BusSynchronizer
 from migen.genlib.fifo import SyncFIFO
 
 from litex.gen import *
@@ -336,8 +336,13 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
             MultiReg(self.control.fields.enable,      core.enable,      "jesd"),
             MultiReg(self.stpl_enable.storage,        core.stpl_enable, "jesd"),
             MultiReg(self.lmfc.fields.load_on_sysref, core.lmfc.load,   "jesd"),
-            MultiReg(core.stpl.errors, self.stpl_errors.status,  "sys"),
             MultiReg(core.ready,       self.status.fields.ready, "sys"),
+        ]
+        # Error counters: multi-bit words crossed with a handshake (consistent values).
+        self.submodules.stpl_errors_cdc = BusSynchronizer(32, "jesd", "sys")
+        self.comb += [
+            self.stpl_errors_cdc.i.eq(core.stpl.errors),
+            self.stpl_errors.status.eq(self.stpl_errors_cdc.o),
         ]
         if hasattr(core, "skew_fifos"): # RX only.
             self.specials += MultiReg(core.skew_fifos[0].level, self.status.fields.skew_fifo)
@@ -356,4 +361,8 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
             crc_error_pulses = Signal(max=len(core.links) + 1)
             self.comb += crc_error_pulses.eq(Reduce("ADD", [link.crc_error for link in core.links]))
             self.sync.jesd += crc_errors.eq(crc_errors + crc_error_pulses)
-            self.specials += MultiReg(crc_errors, self.crc_errors.status, "sys")
+            self.submodules.crc_errors_cdc = BusSynchronizer(32, "jesd", "sys")
+            self.comb += [
+                self.crc_errors_cdc.i.eq(crc_errors),
+                self.crc_errors.status.eq(self.crc_errors_cdc.o),
+            ]
