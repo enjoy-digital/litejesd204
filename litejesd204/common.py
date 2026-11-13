@@ -144,11 +144,14 @@ class JESD204BSettings:
         self.samples_per_frame = transport_settings.s
 
         self.nibbles_per_word = ceil(phy_settings.np//4)
+        # Octets of one converter per frame.
         self.octets_per_frame = (self.samples_per_frame*
                                  self.nibbles_per_word)//2
+        # Octets per lane and frame (JESD204 F): sizes the frames/multiframes on the lanes.
         self.octets_per_lane  = (self.octets_per_frame*
                                  self.nconverters)//self.nlanes
-        self.lmfc_cycles      = int(self.octets_per_frame*self.transport.k//4)
+        # LMFC period in link clocks (4 octets per clock): F*K/4.
+        self.lmfc_cycles      = int(self.octets_per_lane*self.transport.k//4)
 
     def get_configuration_data(self, lid=0, debug=False):
         cd = JESD204BConfigurationData()
@@ -207,9 +210,9 @@ class JESD204CSettings(JESD204BSettings):
         self.octets_per_block      = 8
         self.blocks_per_multiblock = 32
 
-        # Frames must align with the multiblock structure.
+        # Frames (F octets per lane) must align with the extended multiblock (E multiblocks).
         octets_per_multiblock = self.octets_per_block*self.blocks_per_multiblock
-        assert octets_per_multiblock % self.octets_per_frame == 0
+        assert (e*octets_per_multiblock) % self.octets_per_lane == 0
 
         # Link beats (66-bit blocks) per extended multiblock.
         self.lemc_cycles = e*self.blocks_per_multiblock
