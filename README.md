@@ -80,24 +80,12 @@ enjoy-digital.fr.
 
 [> Documentation
 ----------------
-The **JESD204B & JESD204C Converter Links manual** is the reference of LiteJESD204: a nightly
-[PDF](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.pdf)
-and [HTML page](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.html)
-are published on the [manual-nightly](https://github.com/enjoy-digital/litejesd204/releases/tag/manual-nightly)
-release. Sources in [doc/manual](doc/manual/README.md) (build: `python3 doc/manual/build.py`, outputs in
-`build/doc/`; pandoc, XeLaTeX and the fonts listed in the README of `doc/manual`):
+The **JESD204B & JESD204C Converter Links manual** is the reference of the project, from the primers to the integration,
+the examples, the debugging and the registers:
 
-- **Understand**: [introduction](doc/manual/01_introduction.md), [JESD204 in a nutshell](doc/manual/02_jesd204_primer.md),
-  [JESD204C and 64b/66b](doc/manual/03_jesd204c_primer.md).
-- **The core**: [architecture](doc/manual/04_architecture.md), [transport layer](doc/manual/05_transport.md),
-  [JESD204B link layer](doc/manual/06_link_204b.md), [JESD204C link layer](doc/manual/07_link_204c.md),
-  [TX and RX cores](doc/manual/08_cores.md), [PHYs](doc/manual/09_phys.md).
-- **Use it**: [getting started](doc/manual/10_getting_started.md), [integration](doc/manual/11_integration.md),
-  [examples](doc/manual/12_examples.md), [simulation](doc/manual/13_simulation.md),
-  [debugging](doc/manual/14_debugging.md).
-- **Appendices**: [registers](doc/manual/A_registers.md), [build options](doc/manual/B_build_options.md),
-  [glossary](doc/manual/C_glossary.md), [performance and resources](doc/manual/D_performance.md),
-  [maintaining this manual](doc/manual/E_maintenance.md).
+- Read it: [PDF](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.pdf) or
+  [HTML](https://github.com/enjoy-digital/litejesd204/releases/download/manual-nightly/litejesd204_manual.html) (rebuilt nightly).
+- Sources and local build: [doc/manual](doc/manual/README.md).
 
 [> Getting started
 ------------------
