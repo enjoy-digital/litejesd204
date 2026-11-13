@@ -344,8 +344,9 @@ class LiteJESD204CLinkTX(Module):
     """Link TX layer
     inputs:
     - jesd_settings: JESD204C settings
+    - scrambling:    Scrambling enable (None: from jesd_settings.scrambling)
     """
-    def __init__(self, jesd_settings):
+    def __init__(self, jesd_settings, scrambling=None):
         self.lemc_zero = Signal() # LEMC boundary strobe (jesd domain).
         self.ready     = Signal()
 
@@ -355,6 +356,8 @@ class LiteJESD204CLinkTX(Module):
         # # #
 
         e = jesd_settings.e
+        if scrambling is None:
+            scrambling = jesd_settings.scrambling
 
         # Datapath: octet reorder (MSB first) -> scrambler -> 2 register stages, with the CRC-12
         # computed over the scrambled data and the sync word generator aligned to the delayed
@@ -392,7 +395,7 @@ class LiteJESD204CLinkTX(Module):
         # Scrambler (combinational output).
         self.submodules.scrambler = scrambler = Scrambler64b66b()
         self.comb += [
-            scrambler.enable.eq(int(jesd_settings.scrambling)),
+            scrambler.enable.eq(int(scrambling)),
             scrambler.sink.data.eq(reverse_octets(sink.data)),
         ]
 
@@ -431,8 +434,9 @@ class LiteJESD204CLinkRX(Module):
     """Link RX layer
     inputs:
     - jesd_settings: JESD204C settings
+    - scrambling:    Descrambling enable (None: from jesd_settings.scrambling)
     """
-    def __init__(self, jesd_settings):
+    def __init__(self, jesd_settings, scrambling=None):
         self.sh_lock     = Signal() # Sync header lock (from BlockSync, CDC'd).
         self.ready       = Signal()
         self.frame_start = Signal()
@@ -445,6 +449,8 @@ class LiteJESD204CLinkRX(Module):
         # # #
 
         e = jesd_settings.e
+        if scrambling is None:
+            scrambling = jesd_settings.scrambling
 
         # Datapath: sync header stream decoding (EMB lock), CRC-12 checking over the scrambled
         # payload, descrambling and octet reordering. frame_start strobes with the first source beat
@@ -487,7 +493,7 @@ class LiteJESD204CLinkRX(Module):
         self.submodules.descrambler = descrambler = Descrambler64b66b()
         descrambled = Signal(64)
         self.comb += [
-            descrambler.enable.eq(int(jesd_settings.scrambling)),
+            descrambler.enable.eq(int(scrambling)),
             descrambler.sink.data.eq(sink.data),
         ]
         self.sync += descrambled.eq(descrambler.source.data)

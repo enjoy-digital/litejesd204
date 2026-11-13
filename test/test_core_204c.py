@@ -45,7 +45,7 @@ class FakePHY(Module):
 
 
 class DUT(Module):
-    def __init__(self, settings, converter_data_width=32):
+    def __init__(self, settings, converter_data_width=32, **kwargs):
         self.jref = Signal()
 
         self.clock_domains.cd_jesd = ClockDomain()
@@ -57,8 +57,8 @@ class DUT(Module):
             setattr(self.submodules, f"phy{n}", phy)
             self.phys.append(phy)
 
-        self.submodules.tx = LiteJESD204CCoreTX(self.phys, settings, converter_data_width)
-        self.submodules.rx = LiteJESD204CCoreRX(self.phys, settings, converter_data_width)
+        self.submodules.tx = LiteJESD204CCoreTX(self.phys, settings, converter_data_width, **kwargs)
+        self.submodules.rx = LiteJESD204CCoreRX(self.phys, settings, converter_data_width, **kwargs)
         self.tx.register_jref(self.jref)
         self.rx.register_jref(self.jref)
 
@@ -159,3 +159,33 @@ class TestCore204C(unittest.TestCase):
     def test_core_loopback_e2(self):
         settings, stats = self.core_loopback(e=2)
         self.check_loopback(settings, stats)
+
+    def test_core_scrambling_argument(self):
+        # scrambling=False on the cores disables the link (de)scramblers: with null converter
+        # data, the TX blocks sent to the PHYs are null (they are not when scrambling).
+        for scrambling in [True, False]:
+            with self.subTest(scrambling=scrambling):
+                settings = jesd204c_settings()
+                dut      = DUT(settings, scrambling=scrambling)
+                results  = dict(enables=set(), data=set())
+
+                def generator(dut):
+                    yield dut.tx.enable.eq(1)
+                    yield dut.rx.enable.eq(1)
+                    for _ in range(2*settings.lemc_cycles):
+                        yield dut.jref.eq(1)
+                        yield
+                        for link in dut.tx.links:
+                            results["enables"].add((yield link.scrambler.enable))
+                        for link in dut.rx.links:
+                            results["enables"].add((yield link.descrambler.enable))
+                        for phy in dut.phys:
+                            results["data"].add((yield phy.sink.data))
+
+                fragment, clocks = dut.get_fragment_and_clocks()
+                run_simulation(fragment, {"jesd": generator(dut)}, clocks=clocks)
+                self.assertEqual(results["enables"], {int(scrambling)})
+                if scrambling:
+                    self.assertNotEqual(results["data"], {0})
+                else:
+                    self.assertEqual(results["data"], {0})
