@@ -69,7 +69,7 @@ The four cores take the arguments below; `ilas_check` exists on the JESD204B RX 
 | All | `phys` | required | PHYs, one per lane |
 | All | `jesd_settings` | required | `JESD204BSettings` or `JESD204CSettings` |
 | All | `converter_data_width` | required | Bits per converter and link clock |
-| All | `scrambling` | `True` | 204B: scrambler of the datapath; 204C: no effect |
+| All | `scrambling` | `True` | 204B: scrambler of the datapath; 204C: scrambling, with the setting |
 | All | `stpl_random` | `True` | Pseudo-random STPL values, else the seeds |
 | 204B RX | `ilas_check` | `True` | Reset value of the ILAS check, and of the control field |
 
@@ -80,9 +80,10 @@ transport layer are then that number of samples times N' times M/L bits wide, an
 message of the lane assertion gives the value that fits, 32 (or 64) x L / M x N / N'.
 
 With the default `scrambling`, the JESD204B datapath scrambles; the SCR bit of the ILAS comes from
-the settings, so give both the same value. The JESD204C links take scrambling from
-`JESD204CSettings` only. With a control module, the `ilas_check_disable` field drives the check;
-its reset value is 1 when the core is built with `ilas_check=False`.
+the settings, so give both the same value. The JESD204C links scramble when the argument of the
+core and the setting of `JESD204CSettings` are both true. With a control module, the
+`ilas_check_disable` field drives the check; its reset value is 1 when the core is built with
+`ilas_check=False`.
 
 | Method | Cores | Argument | Effect |
 |-------------------------------|------------------|--------------------------|--------------------------------------|
@@ -90,9 +91,9 @@ its reset value is 1 when the core is built with `ilas_check=False`.
 | `register_jref` | All | `jref` | Connects SYSREF: a `Signal`, or a differential pair |
 
 A JESD204B core must have both methods called before the SoC is finalized, and a JESD204C core
-`register_jref`; the cores assert it. A PHY with an attribute `n` gives its clock domains the
-names `jesd_phy{n}_tx` and `jesd_phy{n}_rx`; without it, the position of the PHY in `phys` is
-used.
+`register_jref`; the cores assert it. The cores take the clock domains of a PHY from its `cd_tx`
+and `cd_rx` attributes. A PHY without them uses the domains `jesd_phy{n}_tx` and
+`jesd_phy{n}_rx` of the design, `n` being its attribute `n` or its position in `phys`.
 
 ## Control modules {#opt-controls}
 

@@ -38,12 +38,12 @@ core = LiteJESD204BCoreRX(phys, settings, converter_data_width=32,
 | `phys` | All | | PHYs in lane order |
 | `jesd_settings` | All | | `JESD204BSettings` or `JESD204CSettings` |
 | `converter_data_width` | All | | Bits per converter field ([Transport](#tr-records)) |
-| `scrambling` | All | `True` | JESD204B scrambling; no effect in JESD204C |
+| `scrambling` | All | `True` | Scrambling of the link layers |
 | `ilas_check` | B RX | `True` | Initial value of the ILAS check, kept by a control module |
 | `stpl_random` | All | `True` | Test pattern values ([Test patterns](#tr-stpl)) |
 
-In JESD204C, the scrambling follows the `scrambling` setting of `JESD204CSettings`
-([Limitations](#lc-limitations)). With a control module, the `ilas_check_disable` field of the
+In JESD204C, the links scramble when this argument and the `scrambling` setting of
+`JESD204CSettings` are both true. With a control module, the `ilas_check_disable` field of the
 `control` register sets the ILAS check; it resets to 1, check off, when the core is built with
 `ilas_check=False` ([Control modules](#cores-control)).
 
@@ -105,11 +105,11 @@ start their sequences and the RX core releases its lanes.
 The counter increments on every link clock. On a rising edge of SYSREF, it reloads with a load
 value instead. SYSREF is registered three times on its way, so the reload happens a few link
 clocks after the edge. With a load value of x, the next boundary comes `lmfc_cycles` - x link
-clocks after the reload when `lmfc_cycles` is a power of two.
+clocks after the reload. Between two edges, the counter wraps at `lmfc_cycles`, so the
+boundaries keep that period whether it is a power of two or not.
 
 A periodic SYSREF reloads the counter at each edge. Its period must be a multiple of the LMFC
-period, and a power of two on this version: the counter does not wrap at `lmfc_cycles`
-([Limitations](#cores-limitations)).
+period, so that each edge reloads the value the counter already has.
 
 The figure below shows the counter in a JESD204B link: SYSREF sets its phase, and the boundaries
 then pace the start of the ILAS on the TX side.
@@ -226,13 +226,6 @@ reference](#registers)).
   octets of one converter in a frame, instead of F (`octets_per_lane`). With L = 2, M = 4, F = 4
   and K = 32, it gives 16 link clocks instead of F x K / 4 = 32; the framer uses the same wrong
   size while the ILAS uses the right one.
-- **LMFC period not a power of two.** The counter has the width of `lmfc_cycles` but does not
-  wrap at it: between two SYSREF edges, its period is the next power of two. F x K / 4 = 10 gives
-  16; 32 x E with E = 3 gives 128 instead of 96.
-- **Periodic SYSREF with such a period.** Each SYSREF edge reloads the counter before or after it
-  wraps. When the load value plus the period does not exceed the next power of two, the counter
-  never reaches 0: no boundary, a JESD204B TX core stays in CGS and a JESD204C TX core never
-  becomes ready. Otherwise the boundaries come once per period, at a wrong position.
 - **Lane coverage.** The per-lane registers cover lanes 0 to 3 or 0 to 7 as the table shows; the
   8-bit level fields can be narrower than a FIFO level.
 - **Tail bits.** The transport layer places a sample with N < N' in the low bits of its word

@@ -12,7 +12,7 @@ from svgdiag import *
 def build():
     d = Diagram(CANVAS_WIDTH, 290)
     d.add(Bus([(205, 45), (205, 280)], dash=DASH_FEEDBACK))
-    d.add(Text(95,  25, "jesd_phy<n>_rx", italic=True, size=FONT_SIZE_SM + 2))
+    d.add(Text(95,  25, "PHY RX domain", italic=True, size=FONT_SIZE_SM + 2))
     d.add(Text(470, 25, "jesd", italic=True, size=FONT_SIZE_TTL))
     phy = d.add(Box(15,  70, 120, 56, label="PHY", fill=COLOR_HARDWARE))
     cdc = d.add(Box(160, 70, 90,  56, label="Crossing", fill=COLOR_ACCENT_LIGHT))

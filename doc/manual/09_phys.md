@@ -29,7 +29,7 @@ The files are in the `doc/manual/` directory of the LiteICLink repository.
 | RX endpoint | `source`: same layout | `source`: same layout |
 | RX control | `rx_align` | `rx_slip` |
 | Line code | 8b/10b, in the PHY | 64b/66b gearbox, in the PHY |
-| Clock domains | `jesd_phy<n>_tx`, `jesd_phy<n>_rx` | Same |
+| Clock domains | `cd_tx`, `cd_rx` of the PHY | Same |
 | Flow control | None: one word per user clock | None: one block per link clock |
 | LiteICLink wrappers | 8b/10b wrappers, 20 or 40 bits | None on the default branch |
 
@@ -43,8 +43,8 @@ A JESD204B core uses three things of each PHY:
   one K flag per octet. The core accepts 16-bit and 32-bit data; octet 0 is the first on the line.
 - **Comma alignment.** An `rx_align` input. The RX link layer holds it high during CGS only, so
   that the PHY aligns on commas then, and never again during the ILAS and the data.
-- **Clock domains.** A TX and an RX user clock domain, named `jesd_phy<n>_tx` and
-  `jesd_phy<n>_rx`, `n` being the attribute `n` of the PHY or its position in the list.
+- **Clock domains.** A TX and an RX user clock domain, the `cd_tx` and `cd_rx` attributes of
+  the PHY ([Clock domains](#phys-domains)).
 
 The LiteICLink 8b/10b wrappers of the Xilinx transceivers have this interface: GTP, GTX and GTH
 on 7-Series, GTH and GTY on UltraScale and UltraScale+. They share the names of the attributes
@@ -81,10 +81,11 @@ LiteICLink manual describes it for each family (`05_serdes_architecture.md`, Clo
 
 ## Clock domains {#phys-domains}
 
-The core does not create the PHY clock domains; it refers to them by name. Migen prefixes the
-domains of a submodule with the name of the submodule when several submodules have a domain of
-the same name. PHYs added as submodules `jesd_phy0`, `jesd_phy1` and so on therefore provide
-`jesd_phy0_tx`, `jesd_phy0_rx` and the others.
+The core takes the clocks and the resets of a lane from its PHY. A LiteICLink wrapper has two
+clock domain attributes, `cd_tx` and `cd_rx`. For each of them the core creates a domain of its
+own, `jesd_phy<n>_tx_core` or `jesd_phy<n>_rx_core`, and drives its clock and its reset from the
+PHY (`phy_clock_domain` in `core.py`). The design has no domain to name, with one lane or
+several; `n` is the attribute `n` of the PHY, or its position in the list.
 
 The snippet below runs in the `__init__` of a LiteX SoC, a `LiteXModule`, where an attribute
 assignment such as `setattr(self, ...)` adds a submodule. In a plain Migen `Module`, use
@@ -104,21 +105,17 @@ for n in range(4):
         rx_buffer_enable = True)
     phy.add_stream_endpoints()
     phy.n = n
-    setattr(self, f"jesd_phy{n}", phy) # Domains: jesd_phy{n}_tx, jesd_phy{n}_rx.
+    setattr(self, f"jesd_phy{n}", phy) # Registers and signals named jesd_phy{n}.
     phys.append(phy)
 ```
 
-The pad names are those of the platform. With a single lane, and no other submodule with a `tx`
-or `rx` domain, nothing is renamed. Rename the domains of the PHY yourself, before adding it,
-which keeps its clocks and its resets:
+The pad names are those of the platform. The name of the submodule only sets the names of the
+registers and of the signals of the PHY.
 
-```python
-phy = ClockDomainsRenamer({"tx": "jesd_phy0_tx", "rx": "jesd_phy0_rx"})(phy)
-self.jesd_phy0 = phy
-```
-
-Creating two domains and driving only their clocks from the PHY is not enough: the resets of
-the PHY domains, which the elastic buffers of the crossings use, would stay at 0.
+A PHY without `cd_tx` and `cd_rx` attributes, such as the stand-in PHYs of the tests, gets no
+domain from the core. The design then provides the domains `jesd_phy<n>_tx` and
+`jesd_phy<n>_rx`, with their clocks and their resets: the elastic buffers of the crossings use
+both.
 
 ## Link clock and reference clock {#phys-clocking}
 
@@ -159,8 +156,8 @@ A JESD204C core expects a PHY that does the 64b/66b gearbox, not the line code o
   one block per link clock, at the line rate divided by 66. The core asserts the 64-bit width.
 - **Slip.** An `rx_slip` input, in the PHY RX domain: each pulse moves the receive gearbox by one
   bit. The block lock waits 32 PHY RX clocks after each pulse ([Thresholds](#lc-thresholds)).
-- **Clock domains.** The same names as in JESD204B; the block lock of each lane runs in its
-  `jesd_phy<n>_rx` domain.
+- **Clock domains.** The same as in JESD204B; the block lock of each lane runs in the RX domain
+  of its PHY.
 
 No LiteICLink wrapper on the default branch provides this interface. The JESD204C cores build and
 simulate with stand-in PHYs ([Simulation and tests](#simulation)), but a JESD204C link on hardware

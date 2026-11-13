@@ -93,5 +93,5 @@
 <text x="695" y="128" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="15" fill="#000000" text-anchor="middle" dominant-baseline="central"><tspan x="695" dy="0">PHYs</tspan></text>
 <text x="90" y="30" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="18" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="90" dy="0">sys</tspan></text>
 <text x="362" y="30" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="18" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="362" dy="0">jesd (link clock)</tspan></text>
-<text x="652" y="30" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="14" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="652" dy="0">jesd_phy&lt;n&gt;_tx/rx</tspan></text>
+<text x="652" y="30" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="14" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="652" dy="0">PHY TX and RX</tspan></text>
 </svg>

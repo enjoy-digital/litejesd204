@@ -123,6 +123,6 @@
 <path d="M460,205 L558,205 L570,217 L570,261 Q570,261 570,261 L472,261 L460,249 L460,205 Q460,205 460,205 Z"/>
 </g>
 <text x="515" y="233" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="15" fill="#000000" text-anchor="middle" dominant-baseline="central"><tspan x="515" dy="0">CRC check</tspan></text>
-<text x="95" y="25" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="14" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="95" dy="0">jesd_phy&lt;n&gt;_rx</tspan></text>
+<text x="95" y="25" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="14" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="95" dy="0">PHY RX domain</tspan></text>
 <text x="470" y="25" font-family="Carlito, Calibri, &#x27;Liberation Sans&#x27;, Arial, sans-serif" font-size="18" fill="#000000" text-anchor="middle" font-style="italic" dominant-baseline="central"><tspan x="470" dy="0">jesd</tspan></text>
 </svg>
