@@ -22,6 +22,28 @@ from litejesd204.transport import LiteJESD204BSTPLGenerator, LiteJESD204BSTPLChe
 from litejesd204.transport import lane_data_width_error
 from litejesd204.link import LiteJESD204BLinkTX, LiteJESD204BLinkRX
 
+# PHY Clock Domains --------------------------------------------------------------------------------
+
+def phy_clock_domain(module, phy, n, direction):
+    """Name of the clock domain of a PHY's TX/RX stream interface (direction: "tx" or "rx").
+
+    PHYs with a cd_tx/cd_rx clock domain (LiteICLink): a core domain jesd_phy{n}_{direction}_core
+    is created in module and driven from it, so the core does not depend on Migen renaming the PHY
+    domains (only done when several PHYs collide, a single lane design did not elaborate). Other
+    PHYs: the design provides the jesd_phy{n}_{direction} clock domain.
+    """
+    phy_cd = "jesd_phy{}_{}".format(n if not hasattr(phy, "n") else phy.n, direction)
+    cd     = getattr(phy, "cd_" + direction, None)
+    if isinstance(cd, ClockDomain):
+        phy_cd  = phy_cd + "_core"
+        core_cd = ClockDomain(phy_cd)
+        module.clock_domains += core_cd
+        module.comb += [
+            core_cd.clk.eq(cd.clk),
+            core_cd.rst.eq(cd.rst),
+        ]
+    return phy_cd
+
 # Clock Domain Crossing ----------------------------------------------------------------------------
 
 class LiteJESD204BTXCDC(Module):
@@ -170,8 +192,7 @@ class LiteJESD204BCoreTX(Module):
         # Links
         self.links = links = []
         for n, (phy, lane) in enumerate(zip(phys, transport.source.flatten())):
-            phy_name = "jesd_phy{}".format(n if not hasattr(phy, "n") else phy.n)
-            phy_cd   = phy_name + "_tx"
+            phy_cd = phy_clock_domain(self, phy, n, "tx")
 
             cdc = LiteJESD204BTXCDC(phy, phy_cd)
             setattr(self.submodules, "cdc"+str(n), cdc)
@@ -278,8 +299,7 @@ class LiteJESD204BCoreRX(Module):
         self.lane_alignments = lane_alignments = []
         self.lane_realigns   = lane_realigns   = []
         for n, (phy, lane) in enumerate(zip(phys, transport.sink.flatten())):
-            phy_name = "jesd_phy{}".format(n if not hasattr(phy, "n") else phy.n)
-            phy_cd = phy_name + "_rx"
+            phy_cd = phy_clock_domain(self, phy, n, "rx")
 
             cdc = LiteJESD204BRXCDC(phy, phy_cd)
             setattr(self.submodules, "cdc"+str(n), cdc)
