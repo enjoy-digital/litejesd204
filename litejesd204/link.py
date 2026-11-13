@@ -180,48 +180,67 @@ class Deframer(Module):
 class AlignInserter(Module):
     """Alignment Character Inserter
     cf section 5.3.3.4.3
+    Without scrambling, the last octet of a frame is compared with the last octet of the previous
+    frame (octets_per_frame octets earlier on the lane). restart (framer reset, during CGS/ILAS):
+    the first frame after it is not compared with the data of the previous clock (not sent).
     """
-    def __init__(self, data_width):
+    def __init__(self, data_width, octets_per_frame=4):
         self.scrambling = Signal(reset=1)
+        self.restart    = Signal()
         self.sink       = sink   = Record(link_layout(data_width))
         self.source     = source = Record(link_layout(data_width))
         self.latency = 0
 
         # # #
 
+        octets_per_clock = data_width//8
+        assert octets_per_frame <= octets_per_clock
+
         self.comb += source.eq(sink)
 
-        data_last = [Signal(8) for i in range(data_width//8)]
+        # Lane octets: previous clock then current clock (original data).
+        sink_data_d       = Signal(data_width)
+        sink_data_d_valid = Signal()
+        self.sync += [
+            sink_data_d.eq(sink.data),
+            sink_data_d_valid.eq(~self.restart),
+        ]
+        octets = ([sink_data_d[8*i:8*(i+1)] for i in range(octets_per_clock)] +
+                  [sink.data[8*i:8*(i+1)]   for i in range(octets_per_clock)])
 
-        for i in range(data_width//8):
-            data = sink.data[8*i:8*(i+1)]
+        for i in range(octets_per_clock):
+            data      = sink.data[8*i:8*(i+1)]
+            data_last = octets[octets_per_clock + i - octets_per_frame] # Previous frame's octet.
+            data_last_valid = sink_data_d_valid if (i < octets_per_frame) else 1
+            data_equal      = data_last_valid & (data == data_last)
             self.comb += [
                 # With    Scrambling : If last octet in a multiframe equals "A" control character.
-                # Without Scrambling : If last octet in a multiframe equals previous octet.
+                # Without Scrambling : If last octet in a multiframe equals last octet of previous frame.
                 If(sink.multiframe_last[i],
                     If(( self.scrambling & (data == control_characters["A"])) |
-                       (~self.scrambling & (data == data_last[i])),
+                       (~self.scrambling & data_equal),
                         source.ctrl[i].eq(1),
                         source.data[8*i:8*(i+1)].eq(control_characters["A"]),
                     )
                 # With    Scrambling : If last octet in a frame (not at a end of multiframe) equals "F" control character.
-                # Without Scrambling : If last octet in a frame (not at a end of multiframe) equals previous octet.
+                # Without Scrambling : If last octet in a frame (not at a end of multiframe) equals last octet of previous frame.
                 ).Elif(sink.frame_last[i],
                     If(( self.scrambling & (data == control_characters["F"])) |
-                       (~self.scrambling & (data == data_last[i])),
+                       (~self.scrambling & data_equal),
                         source.ctrl[i].eq(1),
                         source.data[8*i:8*(i+1)].eq(control_characters["F"]),
                     )
                 )
             ]
-            self.sync += data_last[i].eq(data)
 
 
 class AlignReplacer(Module):
     """Alignment Character Replacer
     cf section 5.3.3.4.3
+    Without scrambling, /A/ and /F/ are replaced with the last octet of the previous frame
+    (octets_per_frame octets earlier on the lane), as restored.
     """
-    def __init__(self, data_width):
+    def __init__(self, data_width, octets_per_frame=4):
         self.scrambling = Signal(reset=1)
         self.sink       = sink   = Record(link_layout(data_width))
         self.source     = source = Record(link_layout(data_width))
@@ -229,30 +248,34 @@ class AlignReplacer(Module):
 
         # # #
 
+        octets_per_clock = data_width//8
+        assert octets_per_frame <= octets_per_clock
+
         self.comb += source.eq(sink)
 
-        data_last = [Signal(8) for i in range(data_width//8)]
+        # Lane octets (restored): previous clock then current clock.
+        restored   = [Signal(8) for i in range(octets_per_clock)]
+        restored_d = Signal(data_width)
+        self.sync += restored_d.eq(Cat(*restored))
+        octets = ([restored_d[8*i:8*(i+1)] for i in range(octets_per_clock)] + restored)
 
-        for i in range(data_width//8):
-            data = sink.data[8*i:8*(i+1)]
+        for i in range(octets_per_clock):
+            data      = sink.data[8*i:8*(i+1)]
+            data_last = octets[octets_per_clock + i - octets_per_frame] # Previous frame's octet.
+            is_align  = sink.ctrl[i] & ((data == control_characters["A"]) | (data == control_characters["F"]))
             self.comb += [
+                restored[i].eq(data),
                 If(self.scrambling,
                     # No Replacement, just set ctrl to 0.
                     source.ctrl[i].eq(0)
-                ).Else(
-                    # If "A" control character, replace with last octet.
-                    If(sink.ctrl[i] & (sink.data[8*i:8*(i+1)] == control_characters["A"]),
-                        source.ctrl[i].eq(0),
-                        source.data[8*i:8*(i+1)].eq(data_last[i])
-                    ),
-                    # If "A" control character, replace with last octet.
-                    If(sink.ctrl[i] & (sink.data[8*i:8*(i+1)] == control_characters["F"]),
-                        source.ctrl[i].eq(0),
-                        source.data[8*i:8*(i+1)].eq(data_last[i])
-                    )
-                )
+                ).Elif(is_align,
+                    # If "A" or "F" control character, replace with last octet of previous frame.
+                    source.ctrl[i].eq(0),
+                    restored[i].eq(data_last),
+                ),
+                source.data[8*i:8*(i+1)].eq(restored[i]),
             ]
-            self.sync += data_last[i].eq(data)
+
 
 class Aligner(Module):
     def __init__(self, data_width):
@@ -534,7 +557,7 @@ class LiteJESD204BLinkTXDatapath(Module):
         self.submodules.framer = framer
 
         # Alignment
-        self.submodules.align_inserter = align_inserter = AlignInserter(data_width)
+        self.submodules.align_inserter = align_inserter = AlignInserter(data_width, octets_per_frame)
         self.comb += align_inserter.scrambling.eq(scrambler.enable)
 
         # Flow
@@ -544,6 +567,7 @@ class LiteJESD204BLinkTXDatapath(Module):
             framer.reset.eq(~scrambler.valid),
             framer.sink.eq(scrambler.source),
             align_inserter.sink.eq(framer.source),
+            align_inserter.restart.eq(framer.reset),
             self.source.eq(align_inserter.source)
         ]
 
@@ -625,7 +649,7 @@ class LiteJESD204BLinkRXDatapath(Module):
         # # #
 
         # Alignment
-        self.submodules.align_replacer = align_replacer = AlignReplacer(data_width)
+        self.submodules.align_replacer = align_replacer = AlignReplacer(data_width, octets_per_frame)
 
         # Deframing
         deframer = Deframer(data_width,
