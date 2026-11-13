@@ -193,7 +193,7 @@ self.jesd_rx_control = LiteJESD204BCoreControl(self.jesd_rx, sys_clk_freq,
 | Register | Control | Content |
 |----------------------|---------|--------------------------------------------------------------|
 | `control` | B, C | `enable`; B: `ilas_check_disable` |
-| `status` | B, C | `ready`, B: `sync_n`; `skew_fifo`: level of the lane 0 FIFO (RX) |
+| `status` | B, C | `ready`, B: `sync_n`; `skew_fifo`: level of the lane 0 FIFO (RX), 16 bits |
 | `stpl_enable` | B, C | Test pattern on |
 | `stpl_errors` | B, C | Count of the checker ([Test patterns](#tr-stpl)) |
 | `lmfc` | B, C | `load_on_sysref`: load value of the LMFC or LEMC |
@@ -227,7 +227,8 @@ reference](#registers)).
   and K = 32, it gives 16 link clocks instead of F x K / 4 = 32; the framer uses the same wrong
   size while the ILAS uses the right one.
 - **Lane coverage.** The per-lane registers cover lanes 0 to 3 or 0 to 7 as the table shows; the
-  8-bit level fields can be narrower than a FIFO level.
+  8-bit fields of `skew_levels` can be narrower than a FIFO level, unlike the 16-bit `skew_fifo`
+  field of `status`.
 - **Tail bits.** The transport layer places a sample with N < N' in the low bits of its word
   ([Control bits and tail bits](#tr-tail-bits)).
 

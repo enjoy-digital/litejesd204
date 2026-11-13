@@ -43,7 +43,7 @@ Bank `jesd204b_tx`.
 | Register | Offset | Bits | Access | Description |
 |----------------------------|-------------|--------|---------|----------------------------------------|
 | `control` | `0x0000` | 9 | rw | See the fields below. Reset `0x0`. |
-| `status` | `0x0004` | 16 | ro | See the fields below. |
+| `status` | `0x0004` | 24 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 4 | rw | LMFC reload value on SYSREF rising edge. Reset `0x5`. |
@@ -61,7 +61,7 @@ Fields of `status`:
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
 | `sync_n` | 1 | JESD ``SYNC~`` status. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
+| `skew_fifo` | 23:8 | JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core). |
 
 ## JESD204B RX control {#reg-jesd204b-rx}
 
@@ -85,7 +85,7 @@ Bank `jesd204b_rx`.
 | Register | Offset | Bits | Access | Description |
 |----------------------------|-------------|--------|---------|----------------------------------------|
 | `control` | `0x0000` | 9 | rw | See the fields below. Reset `0x0`. |
-| `status` | `0x0004` | 16 | ro | See the fields below. |
+| `status` | `0x0004` | 24 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 4 | rw | LMFC reload value on SYSREF rising edge. Reset `0xb`. |
@@ -106,7 +106,7 @@ Fields of `status`:
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
 | `sync_n` | 1 | JESD ``SYNC~`` status. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
+| `skew_fifo` | 23:8 | JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core). |
 
 ## JESD204C TX control {#reg-jesd204c-tx}
 
@@ -121,7 +121,7 @@ Bank `jesd204c_tx`.
 | Register | Offset | Bits | Access | Description |
 |----------------------------|-------------|--------|---------|----------------------------------------|
 | `control` | `0x0000` | 1 | rw | 1: links out of reset, the core runs. 0: links held in reset. Reset `0x0`. |
-| `status` | `0x0004` | 16 | ro | See the fields below. |
+| `status` | `0x0004` | 24 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. Reset `0x5`. |
@@ -134,7 +134,7 @@ Fields of `status`:
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
+| `skew_fifo` | 23:8 | JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core). |
 
 Fields of `lane_status`:
 
@@ -165,7 +165,7 @@ Bank `jesd204c_rx`.
 | Register | Offset | Bits | Access | Description |
 |----------------------------|-------------|--------|---------|----------------------------------------|
 | `control` | `0x0000` | 1 | rw | 1: links out of reset, the core runs. 0: links held in reset. Reset `0x0`. |
-| `status` | `0x0004` | 16 | ro | See the fields below. |
+| `status` | `0x0004` | 24 | ro | See the fields below. |
 | `stpl_enable` | `0x0008` | 1 | rw | 1: the STPL generator (TX) or checker (RX) replaces the converter port. Reset `0x0`. |
 | `stpl_errors` | `0x000c` | 32 | ro | STPL test errors: link clocks with mismatching samples while STPL is enabled and the core ready, cleared when STPL is enabled (``RX only``). |
 | `lmfc` | `0x0010` | 5 | rw | LEMC reload value on SYSREF rising edge. Reset `0x1b`. |
@@ -178,7 +178,7 @@ Fields of `status`:
 | Field | Bits | Description |
 |------------------------|---------|------------------------------------------------------|
 | `ready` | 0 | 1: every link of the core is synchronized and carries data. |
-| `skew_fifo` | 15:8 | JESD Skew FIFO level (``RX only``, reads 0 on a TX core). |
+| `skew_fifo` | 23:8 | JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core). |
 
 Fields of `lane_status`:
 

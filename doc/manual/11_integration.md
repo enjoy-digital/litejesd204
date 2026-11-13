@@ -402,7 +402,7 @@ all of them.
 | `control` | `ilas_check_disable` | 8 | RX: data phase despite an ILAS mismatch |
 | `status` | `ready` | 0 | All the links of the core are up |
 | `status` | `sync_n` | 1 | Level of SYNC~ in the core |
-| `status` | `skew_fifo` | 8-15 | RX: fill level of the lane 0 skew FIFO |
+| `status` | `skew_fifo` | 8-23 | RX: fill level of the lane 0 skew FIFO |
 | `stpl_enable` | `enable` | 0 | Test pattern instead of samples |
 | `stpl_errors` | | 0-31 | RX: link clocks with a wrong sample, cleared when STPL is enabled |
 | `lmfc` | `load_on_sysref` | 0-3 | LMFC value loaded on a SYSREF edge |

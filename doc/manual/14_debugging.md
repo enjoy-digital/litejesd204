@@ -277,7 +277,7 @@ the open pull request that changes the code, "issue" the open issue where a fix 
 | RX error reporting | No SYNC~ error report, no /A/ check, no disparity or code counters | Use the converter's status and the STPL |
 | STPL values | The core's own pattern, not the standard test patterns | Check against a LiteJESD204 TX only |
 | Lane status width | 204B: levels and alignment of lanes 0-3, overflows of lanes 0-7; 204C: `emb_debug` of lanes 0-3 | Probe the other lanes with LiteScope |
-| Skew levels, 8 bits | Levels of 256 or more wrap, also the 204C skew FIFO with E = 2 | Keep F*K/4 under 64 link clocks, E = 1; issue #31 |
+| `skew_levels`, 8 bits per lane | 204B: levels of 256 or more wrap, with F*K/4 of 64 link clocks or more | Read lane 0 in the 16-bit `skew_fifo` field of `status`, probe the other lanes; issue #31 |
 
 The nibbles row follows from the settings: the core counts the nibbles of a sample with
 `ceil(np//4)` and the octets per frame with an integer division. A frame whose nibbles do not

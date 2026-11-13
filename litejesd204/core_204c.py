@@ -314,7 +314,7 @@ class LiteJESD204CCoreControl(Module, AutoCSR):
                 ("``0b0``", "JESD core not ready, all links are not synchronized."),
                 ("``0b1``", "JESD core ready, all links are synchronized.")
             ]),
-            CSRField("skew_fifo", size=8, offset=8, description="JESD Skew FIFO level (``RX only``, reads 0 on a TX core)."),
+            CSRField("skew_fifo", size=16, offset=8, description="JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core)."),
         ])
         self.stpl_enable = CSRStorage(fields=[
             CSRField("enable", size=1, offset=0, values=[
