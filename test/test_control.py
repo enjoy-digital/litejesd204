@@ -58,5 +58,34 @@ class TestControl(unittest.TestCase):
             self.check_controls(core_cls, LiteJESD204CCoreControl, FakePHY204C,
                 settings(JESD204CSettings), cdw=32, with_jsync=False)
 
+    def test_skew_fifo_level_width(self):
+        # status.skew_fifo holds the full level of the lane 0 skew FIFO (4 multiframes or extended
+        # multiblocks: 256 words and more with F*K/4 >= 64 or E >= 2) and the status register
+        # stays within one 32-bit CSR word (no register moves).
+        def settings_204b(k):
+            ps = JESD204BPhysicalSettings(l=2, m=2, n=16, np=16)
+            ts = JESD204BTransportSettings(f=2, s=1, k=k, cs=0)
+            return JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
+        def settings_204c(e):
+            ps = JESD204BPhysicalSettings(l=2, m=4, n=16, np=16)
+            ts = JESD204BTransportSettings(f=4, s=1, k=32, cs=0)
+            return JESD204CSettings(ps, ts, did=0x5a, bid=0x5, e=e)
+        configs  = [(LiteJESD204BCoreRX, LiteJESD204BCoreControl, FakePHY204B, settings_204b(k), 32, True)
+            for k in [32, 128, 256]]
+        configs += [(LiteJESD204CCoreRX, LiteJESD204CCoreControl, FakePHY204C, settings_204c(e), 32, False)
+            for e in [1, 2, 8]]
+        for core_cls, control_cls, phy_cls, settings, cdw, with_jsync in configs:
+            with self.subTest(core=core_cls.__name__, k=settings.transport.k, e=getattr(settings, "e", None)):
+                phys = [phy_cls(n) for n in range(settings.nlanes)]
+                core = core_cls(phys, settings, cdw)
+                if with_jsync:
+                    core.register_jsync(Signal())
+                core.register_jref(Signal())
+                control = control_cls(core)
+                level   = core.skew_fifos[0].level
+                field   = control.status.fields.skew_fifo
+                self.assertGreaterEqual(len(field), len(level))
+                self.assertLessEqual(len(control.status.status), 32)
+
 if __name__ == "__main__":
     unittest.main()

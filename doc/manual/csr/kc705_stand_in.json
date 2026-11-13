@@ -80,18 +80,18 @@
       "values": []
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
+      "description": "JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
-      "size": 8,
+      "size": 16,
       "values": []
      }
     ],
     "name": "status",
     "offset": 4,
     "reset": null,
-    "size": 16
+    "size": 24
    },
    {
     "access": "rw",
@@ -250,18 +250,18 @@
       "values": []
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
+      "description": "JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
-      "size": 8,
+      "size": 16,
       "values": []
      }
     ],
     "name": "status",
     "offset": 4,
     "reset": null,
-    "size": 16
+    "size": 24
    },
    {
     "access": "rw",
@@ -368,18 +368,18 @@
       ]
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
+      "description": "JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
-      "size": 8,
+      "size": 16,
       "values": []
      }
     ],
     "name": "status",
     "offset": 4,
     "reset": null,
-    "size": 16
+    "size": 24
    },
    {
     "access": "rw",
@@ -547,18 +547,18 @@
       ]
      },
      {
-      "description": "JESD Skew FIFO level (``RX only``, reads 0 on a TX core).",
+      "description": "JESD Skew FIFO level of lane 0 (``RX only``, reads 0 on a TX core).",
       "name": "skew_fifo",
       "offset": 8,
       "reset": 0,
-      "size": 8,
+      "size": 16,
       "values": []
      }
     ],
     "name": "status",
     "offset": 4,
     "reset": null,
-    "size": 16
+    "size": 24
    },
    {
     "access": "rw",
