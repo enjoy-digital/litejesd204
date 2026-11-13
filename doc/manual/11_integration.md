@@ -174,7 +174,7 @@ to the next steps. A board whose clock chip outputs the device clock on a separa
 ## Step 3: PHYs {#integ-phys}
 
 Each lane gets one GTX transceiver, all driven by one quad PLL. The loop below builds them and
-names them `jesd_phy0` to `jesd_phy3`, the names the cores look for.
+names them `jesd_phy0` to `jesd_phy3`, which sets the names of their registers.
 
 ```python
 self.jesd_pll = pll = GTXQuadPLL(refclk, refclk_freq, linerate)
@@ -233,22 +233,12 @@ printed, after a drawing of the PLL:
              = 5.0GHz
 ```
 
-### Naming the PHY clock domains {#integ-domains}
+### The PHY clock domains {#integ-domains}
 
-The cores use the clock domains `jesd_phy{n}_tx` and `jesd_phy{n}_rx`. Each GTX creates domains
-named `tx` and `rx`.
-
-Migen adds the name of the submodule, `jesd_phy0` here, to those names only when several
-submodules define the same ones. With two lanes or more, the loop above is enough. With a single
-lane, and no other submodule with a `tx` or `rx` domain, the elaboration fails with
-`KeyError: 'jesd_phy0_rx'`.
-
-A single-lane design renames the domains of its PHY itself, in the loop before `setattr`. The
-renamed domains keep the clocks and the resets of the PHY, which the elastic buffers use:
-
-```python
-phy = ClockDomainsRenamer({"tx": "jesd_phy0_tx", "rx": "jesd_phy0_rx"})(phy)
-```
+Each GTX creates two clock domains, its `cd_tx` and `cd_rx` attributes. The cores drive their
+side of each lane crossing from them, clock and reset, so the design names no clock domain for
+the PHYs: the loop above is enough with one lane as with several
+([Clock domains](#phys-domains)).
 
 ## Step 4: reset {#integ-reset}
 

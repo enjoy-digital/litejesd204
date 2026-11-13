@@ -53,19 +53,20 @@ python3 -m pytest -v
 the repository; the list is cut.
 
 ```console
-collecting ... collected 49 items
+collecting ... collected 59 items
 
-test/test_align.py::TestAlign::test_aligner PASSED                       [  2%]
+test/test_align.py::TestAlign::test_aligner PASSED                       [  1%]
 [...]
-test/test_core.py::TestCore::test_core_loopback PASSED                   [ 16%]
-test/test_core.py::TestCore::test_core_loopback_f4 PASSED                [ 18%]
-test/test_core_204c.py::TestCore204C::test_core_loopback PASSED          [ 20%]
-test/test_core_204c.py::TestCore204C::test_core_loopback_e2 PASSED       [ 22%]
-test/test_examples.py::TestExamples::test_kc705_gtx PASSED               [ 24%]
+test/test_core.py::TestCore::test_core_loopback PASSED                   [ 13%]
+test/test_core.py::TestCore::test_core_loopback_f4 PASSED                [ 15%]
+test/test_core_204c.py::TestCore204C::test_core_loopback PASSED          [ 16%]
+test/test_core_204c.py::TestCore204C::test_core_loopback_e2 PASSED       [ 18%]
+[...]
+test/test_examples.py::TestExamples::test_kc705_gtx PASSED               [ 23%]
 [...]
 test/test_transport.py::TestTransport::test_transport_tx PASSED          [100%]
 
-======== 49 passed, 1 warning, 37 subtests passed in 136.59s (0:02:16) =========
+======== 59 passed, 1 warning, 71 subtests passed in 174.99s (0:02:54) =========
 ```
 
 The run time depends on the machine. The warning is the combinational cycle that LiteX reports

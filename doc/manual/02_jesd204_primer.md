@@ -298,10 +298,10 @@ chip sends both with a controlled phase. It comes in three forms:
 
 In LiteJESD204, each core has an LMFC counter (`LMFC` in `core.py`) clocked by the link clock. On
 each rising edge of SYSREF it reloads with a value that compensates the input synchronizer and the
-clock domain crossing, adjustable at run time through the `lmfc` register. The counter wraps at
-the next power of two of the multiframe length, which equals F x K / 4 link clocks only when M
-equals L; with a periodic SYSREF, a period that is not a power of two gives missing or misplaced
-boundaries ([Known issues](#debug-known-issues)).
+clock domain crossing, adjustable at run time through the `lmfc` register. Between two SYSREF
+edges the counter wraps at its period, `lmfc_cycles`, whether that is a power of two or not. The
+period equals F x K / 4 link clocks only when M equals L
+([Known issues](#debug-known-issues)).
 
 ## Subclasses {#primer-subclasses}
 

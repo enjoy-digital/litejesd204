@@ -265,7 +265,6 @@ the open pull request that changes the code, "issue" the open issue where a fix 
 | Issue | Effect | Work with it |
 |------------------------------|-----------------------------------------|------------------------------------|
 | LMFC, framer and 204C multiblock check sized on the octets of one converter | LMFC period, frame marks and 204C frame check wrong when M differs from L | Use modes with M = L, check `lmfc_cycles`; fix pending (PR #14) |
-| LMFC counter does not wrap at the LMFC period | Period is the next power of two of F*K/4 (or 32*E); with a periodic SYSREF, boundaries missing or misplaced | Use modes where it is a power of two; fix pending (PR #15) |
 | 204B frame size | The framer takes 1, 2 or 4 octets per frame only | Choose F = 1, 2 or 4 |
 | F not checked | The F of the transport settings goes into the ILAS only; the framing uses the F derived from M, S, N' and L | Check F = M x S x N' / (8 x L); issue #31 |
 | 204C frame size | F must divide 256 octets, whatever E: E > 1 does not enable F = 3 or 6 | Choose an F that divides 256; fix pending (PR #14) |
@@ -273,32 +272,16 @@ the open pull request that changes the code, "issue" the open issue where a fix 
 | Tail bits (N < N') | The N bits sit in the low bits of the N'-bit word | Shift samples in user logic; fix pending (PR #11) |
 | Control bits | CS is advertised from the `cs` setting, but no control bit is sent | Keep `cs=0` |
 | HD always 0 | Modes with F = 1 that split a sample over two lanes need HD = 1 | Choose modes with F of 2 or more |
-| 204B unscrambled mode | Characters compared 4 octets back; a replaced octet that repeats returns as `0xFC` or `0x7C` | Keep scrambling on, the default; fix pending (PR #28) |
+| 204B unscrambled mode | Checked in simulation only, between a TX and an RX of this project | Keep scrambling on, the default, or check the link against the converter |
 | 204B: two scrambling switches | Core argument and ILAS SCR bit can disagree | Give both the same value; issue #31 |
-| 204C core `scrambling` argument | No effect: the settings decide | Set `scrambling` of `JESD204CSettings`; fix pending (PR #16) |
 | RX error reporting | No SYNC~ error report, no /A/ check, no disparity or code counters | Use the converter's status and the STPL |
 | STPL values | The core's own pattern, not the standard test patterns | Check against a LiteJESD204 TX only |
 | Lane status width | 204B: levels and alignment of lanes 0-3, overflows of lanes 0-7; 204C: `emb_debug` of lanes 0-3 | Probe the other lanes with LiteScope |
 | Skew levels, 8 bits | Levels of 256 or more wrap, also the 204C skew FIFO with E = 2 | Keep F*K/4 under 64 link clocks, E = 1; issue #31 |
-| Single-lane designs | `KeyError` on `jesd_phy0_rx`: Migen prefixes the PHY domains only when two PHYs collide | Rename the PHY domains, see [naming](#integ-domains); fix pending (PR #23) |
-
-The LMFC counter counts from the load value to the top of its width, not to F*K/4 (or 32*E). When
-that period is not a power of two, a SYSREF pulse at each multiframe reloads the counter before or
-after it wraps.
-
-Depending on the load value, the LMFC never reaches zero, or reaches it at a wrong
-position in the multiframe.
-
-A JESD204B link then stays in CGS or starts with a wrong latency. A JESD204C core never becomes
-ready, or releases its lanes at the wrong time.
 
 The nibbles row follows from the settings: the core counts the nibbles of a sample with
 `ceil(np//4)` and the octets per frame with an integer division. A frame whose nibbles do not
 fill whole octets, as N' = 12 with S = 1, loses the remainder.
-
-Without scrambling, the TX link compares each octet with the octet 4 positions earlier, the
-previous frame only when F = 4. The RX link restores a replaced character from the octet received
-before it, even when that octet was itself a character, so constant data comes back wrong.
 
 Where to go next: [Simulation and tests](#simulation) to reproduce a finding,
 [Register reference](#registers) for the full register list.

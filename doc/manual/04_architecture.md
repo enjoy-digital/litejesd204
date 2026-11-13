@@ -109,8 +109,8 @@ synchronizers the boundary with sys.](arch_clocks.svg)
 | Domain | Provided by | Content |
 |---------------------|-----------|------------------------------------------------|
 | `jesd` | The design | Transport, link layers, LMFC or LEMC, skew FIFOs |
-| `jesd_phy<n>_tx` | PHY `n` | TX side of the crossing of lane `n` |
-| `jesd_phy<n>_rx` | PHY `n` | RX side of the crossing, JESD204C block lock |
+| PHY TX domain of lane `n` | PHY `n` | TX side of the crossing of lane `n` |
+| PHY RX domain of lane `n` | PHY `n` | RX side of the crossing, JESD204C block lock |
 | `sys` | The SoC | Registers of the control module |
 
 One link clock carries one lane word: 4 octets in JESD204B, one 64-bit block in JESD204C. The
@@ -137,9 +137,10 @@ transport layer. In JESD204B, the position in the list also sets the lane identi
 the ILAS configuration octets of that lane. To connect lanes to transceivers in another order,
 reorder the list.
 
-The core finds the clock domains of a PHY by name. It uses `jesd_phy<n>_tx` and `jesd_phy<n>_rx`,
-where `n` is the attribute `n` of the PHY when it exists, and its position in the list otherwise.
-[PHYs: LiteICLink transceivers](#phys) shows how to name the domains.
+The core takes the TX and RX clock domains of a LiteICLink PHY from the PHY itself, its `cd_tx`
+and `cd_rx` attributes. For a PHY without them, it uses the domains `jesd_phy<n>_tx` and
+`jesd_phy<n>_rx` of the design, where `n` is the attribute `n` of the PHY when it exists, and its
+position in the list otherwise ([PHYs: LiteICLink transceivers](#phys-domains)).
 
 ## Enable and reset {#arch-enable}
 

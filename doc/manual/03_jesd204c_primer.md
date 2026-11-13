@@ -50,9 +50,9 @@ In LiteJESD204, `JESD204CSettings` adds E (`e`, default 1) to the JESD204B setti
 the LEMC period, 32 x E link clocks (`lemc_cycles`). The cores reuse the LMFC counter of the
 JESD204B cores at this period.
 
-That counter wraps at the next power of two, so the LEMC period is right only when E is a power of
-two. The settings also require the octets of one converter in a frame to divide 256, whatever E
-is, so E > 1 does not enable F = 3 or F = 6 in the core ([Known issues](#debug-known-issues)).
+That counter wraps at the LEMC period for any E, such as 96 link clocks with E = 3. The settings
+require the octets of one converter in a frame to divide 256, whatever E is, so E > 1 does not
+enable F = 3 or F = 6 in the core ([Known issues](#debug-known-issues)).
 
 ## The sync word {#c-syncword}
 
@@ -90,8 +90,7 @@ bits without any seed exchange.
 
 In LiteJESD204, `Scrambler64b66b` processes one 64-bit block per link clock, the first octet of the
 block in the most significant position. The settings and the cores have a `scrambling` argument
-for debugging; the link layer follows the argument of the settings only, and the one of the cores
-has no effect ([Known issues](#debug-known-issues)).
+for debugging: the link layer scrambles when both are true, so either one turns scrambling off.
 
 ## Link start-up and lock {#c-lock}
 
