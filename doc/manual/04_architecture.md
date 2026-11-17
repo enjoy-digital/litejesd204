@@ -74,8 +74,8 @@ settings = JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
 ```
 
 For JESD204C, `JESD204CSettings` takes the same two objects and E, the number of multiblocks
-per extended multiblock (1 by default). It checks that the frames of one converter line up with
-the 256 octets of a multiblock. It sets the JESD204C version on a copy of the physical settings
+per extended multiblock (1 by default). It checks that the frames, of F octets per lane, line up
+with the 256 x E octets of an extended multiblock. It sets the JESD204C version on a copy of the physical settings
 object it receives, so the same object can also serve a `JESD204BSettings`.
 
 The settings class derives the values that size the layers. The table below lists them, with
@@ -86,13 +86,13 @@ the values it computes for the example above.
 | `nibbles_per_word` | N' / 4, rounded down | 4 |
 | `octets_per_frame` | S x `nibbles_per_word` / 2 | 2 |
 | `octets_per_lane` | `octets_per_frame` x M / L | 2 |
-| `lmfc_cycles` | `octets_per_frame` x K / 4 | 16 |
+| `lmfc_cycles` | `octets_per_lane` x K / 4 | 16 |
 | `lemc_cycles` (204C) | 32 x E | |
 
-`octets_per_lane` is the F of the standard: the octets of one frame on one lane. The core does
-not check it against the F given by the user, which only goes into the configuration octets. When
-M and L differ, `octets_per_frame` is not F, and the LMFC period and the framer are sized wrong
-([Limitations](#cores-limitations)).
+`octets_per_lane` is the F of the standard: the octets of one frame on one lane. It sizes the
+LMFC period, the framer and the ILAS. The core does not check it against the F given by the user,
+which only goes into the configuration octets. `octets_per_frame` counts the octets of one
+converter in a frame, and equals F only when M equals L.
 
 The settings also fix the subclass to 1 and leave CF and HD at 0. Control bits are not
 supported, so CS must be 0 ([Control bits and tail bits](#tr-tail-bits)).

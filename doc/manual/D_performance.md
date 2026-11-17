@@ -51,8 +51,6 @@ N' = 16.
 
 The converter port of a core carries `converter_data_width // N` samples per link clock; for
 32-bit JESD204B lanes, `converter_data_width` is N times 32*L/(M*N') ([Build options](#opt-cores)).
-The second mode, with M different from L, falls under the LMFC sizing limitation of
-[Known issues](#debug-known-issues).
 
 ## Recorded hardware figures {#perf-recorded}
 

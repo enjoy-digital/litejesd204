@@ -56,10 +56,6 @@ lane carries one frame of 4 octets.
 a high and a low octet, which fill the first two octets of lane 0; converter 1 fills the next
 two, and converters 2 and 3 fill lane 1.](tr_mapping.svg)
 
-The transport layer handles this mode with M different from L, but the link layer sizing does not
-on this version ([Known issues](#debug-known-issues)): use the figure to read the mapping, not as a
-mode to build.
-
 Octet 0 of a lane word, in bits 7 to 0, is the first octet on the line. The sample of converter
 0 therefore goes out high octet first, as the standard requires.
 

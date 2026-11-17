@@ -51,8 +51,8 @@ the LEMC period, 32 x E link clocks (`lemc_cycles`). The cores reuse the LMFC co
 JESD204B cores at this period.
 
 That counter wraps at the LEMC period for any E, such as 96 link clocks with E = 3. The settings
-require the octets of one converter in a frame to divide 256, whatever E is, so E > 1 does not
-enable F = 3 or F = 6 in the core ([Known issues](#debug-known-issues)).
+require F to divide the 256 x E octets of an extended multiblock, so F = 3 or F = 6 is accepted
+with E = 3 and rejected with E = 1.
 
 ## The sync word {#c-syncword}
 

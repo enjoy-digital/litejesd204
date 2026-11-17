@@ -46,15 +46,14 @@ The settings derive these values, used by the cores:
 | `nibbles_per_word` | `ceil(np//4)` | Transport mapping |
 | `octets_per_frame` | S times the nibbles, divided by 2 | Octets of one converter per frame |
 | `octets_per_lane` | `octets_per_frame*M//L` | Octets per lane and frame, F |
-| `lmfc_cycles` | `octets_per_frame*K//4` | LMFC period in link clocks (204B) |
+| `lmfc_cycles` | `octets_per_lane*K//4` | LMFC period in link clocks (204B) |
 | `lemc_cycles` | `32*E` | LEMC period in link clocks (204C) |
 
-`octets_per_lane` equals F. `octets_per_frame` counts the octets of one converter, so it equals
-F, and `lmfc_cycles` equals F*K/4, only when M equals L ([Known issues](#debug-known-issues)).
-`JESD204CSettings` also asserts that a multiblock, 256 octets, holds a whole number of
-`octets_per_frame`.
+`octets_per_lane` equals F, and `lmfc_cycles` equals F*K/4. `octets_per_frame` counts the octets
+of one converter, so it equals F only when M equals L. `JESD204CSettings` also asserts that an
+extended multiblock, 256*E octets, holds a whole number of frames of `octets_per_lane` octets.
 
-The JESD204B links assert that `octets_per_frame` is 1, 2 or 4 and that K is a multiple of the
+The JESD204B links assert that `octets_per_lane` is 1, 2 or 4 and that K is a multiple of the
 frames per link clock. `get_configuration_data(lid, debug=False)` returns the 14 configuration
 octets of lane `lid`, checksum included, and prints them with `debug=True`.
 

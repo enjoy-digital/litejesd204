@@ -167,8 +167,7 @@ class TestMyConfiguration(unittest.TestCase):
 ```
 
 The first assertion checks that the settings agree with F, as the converter datasheet gives it;
-the second compares the LMFC period with the one of the standard, F*K/4 link clocks. The second
-fails for a mode with M different from L ([Known issues](#debug-known-issues)).
+the second compares the LMFC period with the one of the standard, F*K/4 link clocks.
 
 For a data-path test of a mode, copy `test_core.py` (JESD204B) or `test_core_204c.py` (JESD204C)
 and change the settings function at its top. The cores need 32-bit (JESD204B) or 64-bit

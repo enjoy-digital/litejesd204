@@ -105,9 +105,6 @@ bits.
 16-bit word with two tail bits (T), cut into two octets, most significant first; lane 0 carries
 converters 0 and 1, lane 1 converters 2 and 3.](primer_mapping.svg)
 
-This mode, like the AD937x one with two lanes, has M different from L: it illustrates the standard,
-not a mode that the core sizes correctly ([Known issues](#debug-known-issues)).
-
 The receiver does the opposite: it collects the F octets of each lane, rebuilds the words and
 drops the control and tail bits. With HD = 1, a sample may straddle two lanes; with CF > 0,
 control bits are grouped in control words at the end of the frame.
