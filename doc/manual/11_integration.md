@@ -130,17 +130,13 @@ settings = JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
 ```
 
 The example is written for four lanes. The `nlanes` argument only serves the variant of
-[Examples and boards](#ex-ad937x-elab), which keeps four lanes: other values give M different from
-L or lanes that are not 32 bits wide ([Known issues](#debug-known-issues)).
+[Examples and boards](#ex-ad937x-elab), which keeps four lanes; other values were not elaborated
+for this manual.
 
 `did` and `bid` are the device and bank identifiers sent in the configuration data; set them to
 the values the converter expects. With these settings, the LMFC period is 16 link clock cycles.
 The line rate fixes the link clock: 5 Gbps divided by 40 gives 125 MHz (computed). The settings
 and the values they derive are described in [Architecture](#architecture).
-
-When M and L differ, the core sizes the LMFC and the framer from the octets of one converter, not
-from F. Such modes are a known issue of the core ([Known issues](#debug-known-issues)); the
-example keeps M = L.
 
 ## Step 2: clocks {#integ-clocks}
 

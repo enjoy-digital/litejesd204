@@ -11,7 +11,7 @@ maintainer knows what to update when the code changes.
 | 2 JESD204 in a nutshell | `MEMO`, `litejesd204/common.py` (control characters, configuration octets, settings), `litejesd204/link.py` (scrambler, CGS, ILAS, SYNC~), `litejesd204/core.py` (LMFC); JESD204B sections cited in the code |
 | 3 JESD204C and 64b/66b | `litejesd204/link_204c.py` (header comments, scrambler, CRC-12, sync word, `BlockSync`, `SyncWordRX`), `litejesd204/core_204c.py` (PHY contract comment), `litejesd204/common.py` (`JESD204CSettings`) |
 | 4 Architecture | `litejesd204/{common,transport,link,core,link_204c,core_204c}.py` (classes, clock domains, CDC, settings) |
-| 5 Transport layer and test patterns | `litejesd204/transport.py`, `litejesd204/common.py`, `test/test_transport.py`, `test/test_model.py`, `test/model/transport.py`; public issue on tail bits |
+| 5 Transport layer and test patterns | `litejesd204/transport.py`, `litejesd204/common.py`, `test/test_transport.py`, `test/test_model.py`, `test/model/transport.py` |
 | 6 JESD204B link layer | `litejesd204/link.py`, `litejesd204/common.py` |
 | 7 JESD204C link layer | `litejesd204/link_204c.py`, `litejesd204/core_204c.py` (PHY contract); LiteICLink `liteiclink/serdes/` file list |
 | 8 TX and RX cores | `litejesd204/core.py`, `litejesd204/core_204c.py` (constructors, `register_jsync`, `register_jref`, `LMFC`, skew FIFOs, control modules) |

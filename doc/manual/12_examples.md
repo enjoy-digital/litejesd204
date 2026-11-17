@@ -73,9 +73,7 @@ channels) and a 122.88 MHz reference clock:
 | Four lanes | 4 | 4 | 2 | 32 | 2.4576 Gbps | 61.44 MHz |
 | Two lanes | 2 | 4 | 4 | 32 | 4.9152 Gbps | 122.88 MHz |
 
-The link clocks are the line rates divided by 40 (computed). The two-lane mode has M different
-from L, a mode in which the core sizes the LMFC wrong ([Known issues](#debug-known-issues)): use
-the four-lane mode.
+The link clocks are the line rates divided by 40 (computed).
 
 The example uses old import paths. The table below gives their replacements; the classes and
 their arguments are unchanged.

@@ -105,18 +105,14 @@ bits.
 16-bit word with two tail bits (T), cut into two octets, most significant first; lane 0 carries
 converters 0 and 1, lane 1 converters 2 and 3.](primer_mapping.svg)
 
-This mode, like the AD937x one with two lanes, has M different from L: it illustrates the standard,
-not a mode that the core sizes correctly ([Known issues](#debug-known-issues)).
-
 The receiver does the opposite: it collects the F octets of each lane, rebuilds the words and
 drops the control and tail bits. With HD = 1, a sample may straddle two lanes; with CF > 0,
 control bits are grouped in control words at the end of the frame.
 
 In LiteJESD204, the transport layer (`LiteJESD204BTransportTX`, `LiteJESD204BTransportRX`) handles
 several frames per link clock and is shared by JESD204B and JESD204C. It has no control bits and
-no HD or CF format. It places the N conversion bits in the low bits of the N'-bit word, not at the
-top, so a converter with N smaller than N' receives its samples shifted ([Known
-issues](#debug-known-issues)).
+no HD or CF format; when N is smaller than N', it sends the tail bits as zeros ([Control bits and
+tail bits](#tr-tail-bits)).
 
 ## 8b/10b and control characters {#primer-characters}
 

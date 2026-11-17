@@ -259,17 +259,14 @@ litescope_cli -r jsync --offset 128 --length 512
 ## Known issues {#debug-known-issues}
 
 The code of the default branch has the limitations below. This is the one list of the manual:
-other chapters link here. Each row gives the effect and how to work with it; "fix pending" names
-the open pull request that changes the code, "issue" the open issue where a fix is discussed.
+other chapters link here. Each row gives the effect and how to work with it; "issue" names the
+open issue where a fix is discussed.
 
 | Issue | Effect | Work with it |
 |------------------------------|-----------------------------------------|------------------------------------|
-| LMFC, framer and 204C multiblock check sized on the octets of one converter | LMFC period, frame marks and 204C frame check wrong when M differs from L | Use modes with M = L, check `lmfc_cycles`; fix pending (PR #14) |
 | 204B frame size | The framer takes 1, 2 or 4 octets per frame only | Choose F = 1, 2 or 4 |
 | F not checked | The F of the transport settings goes into the ILAS only; the framing uses the F derived from M, S, N' and L | Check F = M x S x N' / (8 x L); issue #31 |
-| 204C frame size | F must divide 256 octets, whatever E: E > 1 does not enable F = 3 or 6 | Choose an F that divides 256; fix pending (PR #14) |
 | Nibbles that do not fill octets | Octets per frame truncated | Use N' = 8 or 16 |
-| Tail bits (N < N') | The N bits sit in the low bits of the N'-bit word | Shift samples in user logic; fix pending (PR #11) |
 | Control bits | CS is advertised from the `cs` setting, but no control bit is sent | Keep `cs=0` |
 | HD always 0 | Modes with F = 1 that split a sample over two lanes need HD = 1 | Choose modes with F of 2 or more |
 | 204B unscrambled mode | Checked in simulation only, between a TX and an RX of this project | Keep scrambling on, the default, or check the link against the converter |

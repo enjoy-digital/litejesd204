@@ -222,15 +222,9 @@ reference](#registers)).
 
 ## Limitations {#cores-limitations}
 
-- **LMFC period when M and L differ.** `lmfc_cycles` is computed from `octets_per_frame`, the
-  octets of one converter in a frame, instead of F (`octets_per_lane`). With L = 2, M = 4, F = 4
-  and K = 32, it gives 16 link clocks instead of F x K / 4 = 32; the framer uses the same wrong
-  size while the ILAS uses the right one.
 - **Lane coverage.** The per-lane registers cover lanes 0 to 3 or 0 to 7 as the table shows; the
   8-bit fields of `skew_levels` can be narrower than a FIFO level, unlike the 16-bit `skew_fifo`
   field of `status`.
-- **Tail bits.** The transport layer places a sample with N < N' in the low bits of its word
-  ([Control bits and tail bits](#tr-tail-bits)).
 
 Each item is listed with its workaround in [Known issues](#debug-known-issues).
 
