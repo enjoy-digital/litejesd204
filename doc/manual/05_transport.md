@@ -17,7 +17,7 @@ standard are explained in [JESD204 in a nutshell](#jesd204-primer).
 | Lane width | 32 bits (JESD204B), 64 bits (JESD204C) |
 | Logic | Combinational: wiring only, no latency |
 | Clock domain | `jesd` |
-| Not supported | Control bits (CS), CF, HD, tail bits at their standard place |
+| Not supported | Control bits (CS), CF, HD |
 
 ## Converter and lane records {#tr-records}
 
@@ -76,17 +76,16 @@ and add no latency.
 The transport layer carries samples only. It inserts no control bits, so CS must be 0, and the
 CF and HD modes of the standard are not implemented.
 
-When N is smaller than N', the standard places the N bits of the sample at the top of the N'-bit
-word and fills the bits below with tail bits. The transport layer places the sample in the low N
-bits instead, with zeros above it. The RX side keeps the low N bits of each word, so a TX core
-and an RX core of this project agree with each other, but not with a converter.
+When N is smaller than N', the N bits of the sample sit at the top of the N'-bit word and the
+N' - N bits below are tail bits, as in the standard. The TX side sends the tail bits as zeros; the
+RX side drops them, whatever their value.
 
-With N = 14 and N' = 16, for example, an ADC sends its sample in bits 15 to 2. The RX core
-returns bits 13 to 0: the two tail bits at the bottom and the two top bits of the sample lost.
+With N = 14 and N' = 16, for example, a sample occupies bits 15 to 2 of its word and bits 1 and 0
+are tail bits. On the user side, the sample stays an N-bit value in the converter field
+([Converter and lane records](#tr-records)).
 
-Use configurations with N = N' ([Known issues](#debug-known-issues)). Another way is to declare
-N = N' and take the top N bits in the user logic; the configuration octets then advertise N = N',
-which the converter or the ILAS check may reject.
+A design written for an earlier version of the core, which placed the sample in the low N bits of
+the word, may shift the samples in its own logic when N is smaller than N'. Remove that shift.
 
 ## Test patterns {#tr-stpl}
 

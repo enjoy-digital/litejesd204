@@ -114,9 +114,8 @@ control bits are grouped in control words at the end of the frame.
 
 In LiteJESD204, the transport layer (`LiteJESD204BTransportTX`, `LiteJESD204BTransportRX`) handles
 several frames per link clock and is shared by JESD204B and JESD204C. It has no control bits and
-no HD or CF format. It places the N conversion bits in the low bits of the N'-bit word, not at the
-top, so a converter with N smaller than N' receives its samples shifted ([Known
-issues](#debug-known-issues)).
+no HD or CF format; when N is smaller than N', it sends the tail bits as zeros ([Control bits and
+tail bits](#tr-tail-bits)).
 
 ## 8b/10b and control characters {#primer-characters}
 

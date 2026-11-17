@@ -229,8 +229,6 @@ reference](#registers)).
 - **Lane coverage.** The per-lane registers cover lanes 0 to 3 or 0 to 7 as the table shows; the
   8-bit fields of `skew_levels` can be narrower than a FIFO level, unlike the 16-bit `skew_fifo`
   field of `status`.
-- **Tail bits.** The transport layer places a sample with N < N' in the low bits of its word
-  ([Control bits and tail bits](#tr-tail-bits)).
 
 Each item is listed with its workaround in [Known issues](#debug-known-issues).
 
