@@ -43,6 +43,7 @@ class LiteJESD204BTransportTX(Module):
         # Compute parameters
         samples_per_clock = converter_data_width//jesd_settings.phy.n
         samples_per_frame = jesd_settings.transport.s
+        tail_bits         = jesd_settings.phy.np - jesd_settings.phy.n
         lane_data_width   = (samples_per_clock*
                              jesd_settings.phy.np*
                              jesd_settings.nconverters)//jesd_settings.nlanes
@@ -69,8 +70,8 @@ class LiteJESD204BTransportTX(Module):
                         (current_sample+i+1)*jesd_settings.phy.n])
                     frame_samples.append(sample)
 
-            # Frame's words
-            frame_words = frame_samples # no control bits
+            # Frame's words (zero tail bits)
+            frame_words = [sample << tail_bits for sample in frame_samples] # no control bits
 
             # Frame's nibbles
             frame_nibbles = []
@@ -117,6 +118,7 @@ class LiteJESD204BTransportRX(Module):
         # Compute parameters
         samples_per_clock = converter_data_width//jesd_settings.phy.n
         samples_per_frame = jesd_settings.transport.s
+        tail_bits         = jesd_settings.phy.np - jesd_settings.phy.n
         lane_data_width   = (samples_per_clock*
                              jesd_settings.phy.np*
                              jesd_settings.nconverters)//jesd_settings.nlanes
@@ -158,8 +160,8 @@ class LiteJESD204BTransportRX(Module):
                         self.comb += word[4*k:4*(k+1)].eq(frame_nibbles.pop())
                     frame_words.append(word)
 
-            # Frame's samples
-            frame_samples = frame_words # no control bits
+            # Frame's samples (discard tail bits)
+            frame_samples = [word[tail_bits:] for word in frame_words] # no control bits
 
             # Converters' samples for a frame
             for j in range(jesd_settings.nconverters):

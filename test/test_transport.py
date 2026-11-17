@@ -111,6 +111,33 @@ class TestTransport(unittest.TestCase):
             reference, output = self.transport_rx_test(nlanes, 4, 64)
             self.assertEqual(reference, output)
 
+    def test_transport_tail_bits(self):
+        ps = JESD204BPhysicalSettings(l=1, m=1, n=14, np=16)
+        ts = JESD204BTransportSettings(f=2, s=1, k=16, cs=0)
+        jesd_settings = JESD204BSettings(ps, ts, did=0x5a, bid=0x5)
+
+        dut = Module()
+        dut.submodules.tx = LiteJESD204BTransportTX(jesd_settings, 28)
+        dut.submodules.rx = LiteJESD204BTransportRX(jesd_settings, 28)
+        output_lanes   = []
+        output_samples = []
+
+        def generator(dut):
+            # Samples 0x0123 and 0x2abc become words 0x048c and 0xaaf0.
+            yield dut.tx.sink.converter0.eq(0x0aaf0123)
+            for tail in range(4):
+                # Drive RX independently and vary both words' trailing bits.
+                yield dut.rx.sink.lane0.eq(0xf0aa8c04 | (tail << 8) | (tail << 24))
+                yield
+                output_lanes.append((yield dut.tx.source.lane0))
+                output_samples.append((yield dut.rx.source.converter0))
+
+        run_simulation(dut, generator(dut))
+        with self.subTest(direction="tx"):
+            self.assertEqual(output_lanes, [0xf0aa8c04]*4)
+        with self.subTest(direction="rx"):
+            self.assertEqual(output_samples, [0x0aaf0123]*4)
+
     def transport_loopback_test(self, nlanes, nconverters, converter_data_width):
         ps = JESD204BPhysicalSettings(l=nlanes, m=nconverters, n=16, np=16)
         ts = JESD204BTransportSettings(f=2, s=1, k=16, cs=1)
